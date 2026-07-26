@@ -62,11 +62,14 @@ happening.
 | 3 | A knob that dims | 5 | Not everything is on/off |
 | 4 | The computer takes over | 4 | First LED that needs a program |
 
-Builds 1–3 run entirely off the breadboard rails, which the extension board
-powers on its own — so there is nothing to hook up before the first build, and
-the board only wants USB *power*. A phone charger is enough. That is deliberate:
-a working circuit shouldn't depend on a laptop being open, and it keeps the
-first three sessions free of any software.
+Builds 1–3 run entirely off the **bottom rail pair — 5 V and GND** — which the
+extension board powers on its own, so there is nothing to hook up before the
+first build and the board only wants USB *power*. A phone charger is enough.
+That is deliberate: a working circuit shouldn't depend on a laptop being open,
+and it keeps the first three sessions free of any software.
+
+(With 220 Ω the LEDs draw about 14 mA on 5 V — well inside a standard part, and
+brighter than they would be on 3.3 V, which is no bad thing here.)
 
 Build 1 is only three placements — resistor, light, wire — because of this.
 Getting to the first lit LED fast matters more than anything else in the

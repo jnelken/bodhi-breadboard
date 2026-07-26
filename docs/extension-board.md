@@ -111,10 +111,11 @@ never use GPIO 16 or 17 on this hardware.
   28–30 (column `d`), and GND at position 26 (column `d`) plus 13, 19 and 28–32
   (column `g`). Plenty of both rails without running long jumpers.
 - **The extension board powers the breadboard's rails itself.** Confirmed on the
-  bench: plug in USB and the rails are live with no jumper from any pin. This is
-  easy to miss and worth remembering — **do not run a wire from a 3.3V or 5V pin
-  into a rail.** At best it is redundant; at worst it ties two supplies together.
-  Builds tap the rails directly.
+  bench: plug in USB and the rails are live with no jumper from any pin. The
+  **top pair carries 3.3 V and GND, the bottom pair 5 V and GND**, matching the
+  screw terminals above each. This is easy to miss and worth remembering — **do
+  not run a wire from a 3.3V or 5V pin into a rail.** At best it is redundant; at
+  worst it ties two supplies together. Builds tap the rails directly.
 - **Screw terminals**, one pair over each power rail, reaching from position 13
   out to about 16. With the board laid out horizontally and the extension board
   on the left: **`EXT-3.3V` / `GND` is the top pair, `5V` / `GND` is the bottom
