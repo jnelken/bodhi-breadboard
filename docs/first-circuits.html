@@ -104,10 +104,20 @@
   }
   .stage svg { display: block; width: 100%; height: auto; }
 
+  /* The instruction and the "Try it" note both change size between steps, and a
+     five-year-old aiming at a big button does not want it moving under his
+     finger. Reserve the tallest case once, here, so Back/Next never move.
+     Budget: two lines of .say (2.7em at its largest, ~63px) + 14px gap +
+     a three-line .check (~75px) + its 16px padding. */
+  .readout {
+    min-height: 168px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
   .say {
     font-size: clamp(1.15rem, 2.6vw, 1.45rem);
     line-height: 1.35; text-wrap: balance;
-    min-height: 2.2em; max-width: 40ch;
+    min-height: 2.7em; max-width: 40ch;   /* two full lines, not 1.6 */
   }
   .check {
     border-left: 3px solid var(--glow);
@@ -192,8 +202,10 @@
         <svg id="stage" viewBox="0 0 1480 470" role="img" aria-label="Breadboard build step"></svg>
       </div>
 
-      <p class="say" id="say"></p>
-      <div class="check" id="check" hidden></div>
+      <div class="readout">
+        <p class="say" id="say"></p>
+        <div class="check" id="check" hidden></div>
+      </div>
 
       <div class="nav">
         <button type="button" class="ghost" id="prev">Back</button>
