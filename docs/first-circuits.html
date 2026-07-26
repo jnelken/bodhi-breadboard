@@ -404,8 +404,8 @@
     { k:'led', n:1, tone:'#3E9E5A', label:'green light' },
     { k:'led', n:1, tone:'#3F7FD0', label:'blue light' },
     { k:'pot', n:1, label:'knob' },
-    { k:'w', n:2, tone:'var(--w-5v)', label:'red wire' },
-    { k:'w', n:5, tone:'var(--w-gnd)', label:'black wire' },
+    { k:'w', n:1, tone:'var(--w-5v)', label:'red wire' },
+    { k:'w', n:4, tone:'var(--w-gnd)', label:'black wire' },
     { k:'w', n:1, tone:'var(--w-s1)', label:'yellow wire' }
   ];
 
@@ -538,7 +538,7 @@
           check:'<b>Break the board in yourself.</b> A fresh breadboard is stiff, and small hands pushing an LED leg into an unyielding hole is the fastest way for him to decide he is bad at this.' },
         { k:'parts',
           say:'Find these pieces.',
-          check:'<b>All five builds use only this.</b> Builds 0–3 need no laptop at all — the board just needs USB power, so a phone charger is enough.' }
+          check:'<b>All five builds use only this.</b> Builds 0–3 need no laptop at all — the extension board already powers the two long rails, so it just wants USB power. A phone charger is enough.' }
       ]
     },
     {
@@ -553,10 +553,8 @@
     },
     {
       id: 'light', tab: '1 · Make a light', cum: true,
-      why: 'Five placements and it works, with no laptop involved. Resist helping — if the LED is backwards, let him discover that turning it around fixes it.',
+      why: 'Three placements and it lights, with no laptop involved. The extension board already powers the two long rails, so there is nothing to hook up first. Resist helping — if the LED is backwards, let him discover that turning it around fixes it.',
       steps: [
-        { k:'w', a:['A',29], b:['Pb',29], c:'v5', say:'Red wire. The power comes out here.' },
-        { k:'w', a:['A',26], b:['Pbn',26], c:'gnd', say:'Black wire. This is the way back.' },
         { k:'r', a:['Pb',38], b:['B',38], v:'220Ω', say:'A resistor, so the light does not get too much.' },
         { k:'led', row:'C', a:38, b:39, tone:'#D94F3D', say:'The light! Long leg on the left.' },
         { k:'w', a:['B',39], b:['Pbn',39], c:'gnd', say:'Last wire. This closes the loop.',
@@ -598,7 +596,9 @@
     }
   ];
 
-  const HOT = { prep:[], light:[26,29], two:[26,29], knob:[26,29], code:[26,27,29], rows:[] };
+  // Extension board pins to pick out. The rails are powered by the board
+  // itself, so builds 1-3 do not touch a named pin at all — only build 4 does.
+  const HOT = { prep:[], light:[], two:[], knob:[], code:[27], rows:[] };
 
   const $ = id => document.getElementById(id);
   let bi = 0, si = 0;

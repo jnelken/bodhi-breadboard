@@ -57,14 +57,20 @@ happening.
 | # | Build | Pieces | Payoff |
 |---|---|---|---|
 | 0 | The secret rows | none | He discovers the hidden connections himself |
-| 1 | Make a light | 5 | It lights up — **no code needed** |
+| 1 | Make a light | 3 | It lights up — **no code needed** |
 | 2 | Two lights | 3 | Same pattern twice; branches are a repeatable idea |
 | 3 | A knob that dims | 5 | Not everything is on/off |
 | 4 | The computer takes over | 4 | First LED that needs a program |
 
-Builds 1–3 run entirely off the 3.3 V rail, so the only thing plugged into the
-laptop is power. That is deliberate: a working circuit shouldn't depend on a
-laptop being open, and it keeps the first three sessions free of any software.
+Builds 1–3 run entirely off the breadboard rails, which the extension board
+powers on its own — so there is nothing to hook up before the first build, and
+the board only wants USB *power*. A phone charger is enough. That is deliberate:
+a working circuit shouldn't depend on a laptop being open, and it keeps the
+first three sessions free of any software.
+
+Build 1 is only three placements — resistor, light, wire — because of this.
+Getting to the first lit LED fast matters more than anything else in the
+sequence.
 
 Build 4 is the hinge — an LED that stays stubbornly dark until `FirstLight` is
 uploaded. That's the moment code becomes worth caring about.
