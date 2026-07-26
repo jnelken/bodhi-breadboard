@@ -11,6 +11,7 @@
     --w-5v: #C93A31; --w-3v3: #C2610C; --w-gnd: #33403A;
     --w-s1: #B8890A; --w-sig: #7A4FBF;
     --glow: #E0A32E;
+    --readout-h: 168px;   /* instruction block height; Pac-Man matches it */
     --font-display: "Avenir Next Condensed", "HelveticaNeue-CondensedBold", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
     --font-body: "Charter", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
     --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
@@ -110,7 +111,7 @@
      Budget: two lines of .say (2.7em at its largest, ~63px) + 14px gap +
      a three-line .check (~75px) + its 16px padding. */
   .readout {
-    min-height: 168px;
+    min-height: var(--readout-h);
     display: flex; flex-direction: row; align-items: stretch; gap: 24px;
   }
   .readout-text {
@@ -130,9 +131,14 @@
      facing left so he is eating toward the words. Two frames only — the mouth
      swaps clip-path with no transition between them. */
   .pac {
+    /* Explicit width and height, not aspect-ratio + stretch: an empty flex item
+       takes its main size from its content, so aspect-ratio never gets a width
+       to work from and he collapses to zero. Safari is especially unforgiving
+       here, and the iPad is the target. */
     flex: 0 0 auto;
-    align-self: stretch;
-    aspect-ratio: 1 / 1;
+    width: var(--readout-h);
+    height: var(--readout-h);
+    align-self: center;
     border-radius: 50%;
     background: var(--glow);
     clip-path: polygon(0 74%, 50% 50%, 0 26%, 0 0, 100% 0, 100% 100%, 0 100%);
