@@ -150,8 +150,15 @@
   .part { fill: var(--surface); stroke: var(--ink); stroke-width: 1.6; }
   .tval { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); font-weight: 600; text-anchor: middle; }
   .tpin { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-2); text-anchor: middle; }
-  .extlbl { font-family: var(--font-mono); font-size: 9px; fill: var(--ink-3); }
-  .extlbl.on { fill: var(--brass); font-weight: 700; }
+  /* The extension board is a real dark PCB sitting on top of the breadboard, so
+     it keeps the same colours in both themes — it reads as an object, not a
+     diagram element. */
+  .extbody { fill: #1E2723; stroke: #55655B; stroke-width: 1.4; }
+  .extpad { fill: #C9A227; }
+  .extlbl { font-family: var(--font-mono); font-size: 9px; fill: #A9B8AE; }
+  .extlbl.on { fill: #F0C255; font-weight: 700; }
+  .exttxt { font-family: var(--font-mono); font-size: 10px; fill: #C3D0C7; text-anchor: middle; }
+  .exttight { fill: none; stroke: #E0A32E; stroke-width: 1.5; stroke-dasharray: 3 3; }
 
   .done { opacity: 0.3; }
   .halo { fill: none; stroke: var(--glow); stroke-width: 3; stroke-dasharray: 7 5; }
@@ -237,7 +244,10 @@
   // ---------- drawing ----------
   function board() {
     const w = X(SPAN1) - X(SPAN0) + PAD * 1.4;
-    let s = `<rect class="bb-body" x="10" y="${BOARD_T}" width="${w + 24}" height="${BOARD_B - BOARD_T}" rx="7"/>`;
+    let s = `<defs><filter id="extshade" x="-8%" y="-8%" width="124%" height="128%">` +
+            `<feDropShadow dx="3" dy="6" stdDeviation="4.5" flood-color="#000" flood-opacity="0.5"/>` +
+            `</filter></defs>`;
+    s += `<rect class="bb-body" x="10" y="${BOARD_T}" width="${w + 24}" height="${BOARD_B - BOARD_T}" rx="7"/>`;
     s += `<rect class="bb-channel" x="10" y="${CH_T}" width="${w + 24}" height="${CH_B - CH_T}"/>`;
     s += `<line class="rail-pos" x1="18" y1="${Y('Pt') - 12}" x2="${w + 28}" y2="${Y('Pt') - 12}"/>`;
     s += `<line class="rail-neg" x1="18" y1="${Y('Ptn') + 12}" x2="${w + 28}" y2="${Y('Ptn') + 12}"/>`;
@@ -267,16 +277,54 @@
                   21:'18', 22:'5', 23:'GND', 24:'4', 25:'0', 26:'2', 27:'15',
                   28:'GND', 29:'GND', 30:'GND', 31:'GND', 32:'GND' };
 
+  // The extension board's real footprint, which is much more than the pin spine:
+  // the PCB covers the whole left end of the breadboard including both power
+  // rails (positions 1-12), and the terminal blocks reach out to position 16 —
+  // which leaves position 17 on the rails only just reachable.
+  //
+  // Drawn as one path so the whole silhouette casts a single shadow and reads as
+  // one solid object covering those holes.
   function extBoard(hot) {
-    const x0 = X(EXT_FROM) - 11, w = X(EXT_TO) - X(EXT_FROM) + 22;
-    let s = `<rect class="part" x="${x0}" y="154" width="${w}" height="126" rx="3"/>`;
+    const xA = X(1) - 14;        // left edge, just inside the breadboard
+    const xB = X(12) + 11;       // end of the full-width block
+    const xC = X(16) + 11;       // end of the power-rail covers
+    const xD = X(EXT_TO) + 11;   // end of the pin spine
+    const yT = BOARD_T + 4, yB = BOARD_B - 4;
+    const railT = 62, railB = 372;
+    const spineT = 154, spineB = 280;
+
+    const d = [`M${xA} ${yT}`, `H${xC}`, `V${railT}`, `H${xB}`, `V${spineT}`, `H${xD}`,
+               `V${spineB}`, `H${xB}`, `V${railB}`, `H${xC}`, `V${yB}`, `H${xA}`, 'Z'].join(' ');
+    let s = `<path class="extbody" d="${d}" filter="url(#extshade)"/>`;
+
+    // Screw terminals, sitting over the rails
+    s += `<rect class="extbody" x="${X(13) - 5}" y="22" width="${X(16) - X(13) + 10}" height="30" rx="2"/>`;
+    s += `<text class="exttxt" x="${(X(13) + X(16)) / 2}" y="41">5V GND</text>`;
+    s += `<rect class="extbody" x="${X(13) - 5}" y="380" width="${X(16) - X(13) + 10}" height="30" rx="2"/>`;
+    s += `<text class="exttxt" x="${(X(13) + X(16)) / 2}" y="399">3V3 GND</text>`;
+
+    // Pin rows: this is where it actually plugs in — columns d and g
     for (let p = EXT_FROM; p <= EXT_TO; p++) {
       const on = hot.has(p);
-      s += `<text class="extlbl${on ? ' on' : ''}" transform="translate(${X(p) + 4} 216) rotate(-90)">${esc(G_LAB[p])}</text>`;
-      s += `<text class="extlbl${on ? ' on' : ''}" transform="translate(${X(p) + 4} 278) rotate(-90)">${esc(D_LAB[p])}</text>`;
+      s += `<circle class="extpad" cx="${X(p)}" cy="${Y('G')}" r="3.2"/>`;
+      s += `<circle class="extpad" cx="${X(p)}" cy="${Y('D')}" r="3.2"/>`;
+      s += `<text class="extlbl${on ? ' on' : ''}" transform="translate(${X(p) + 4} 210) rotate(-90)">${esc(G_LAB[p])}</text>`;
+      s += `<text class="extlbl${on ? ' on' : ''}" transform="translate(${X(p) + 4} 268) rotate(-90)">${esc(D_LAB[p])}</text>`;
     }
-    // Sits in the clear band between the two label rows so it can't collide.
-    s += `<text class="tpin" x="${x0 + w / 2}" y="240" text-anchor="middle">the little computer</text>`;
+
+    s += `<text class="exttxt" x="${(xA + xB) / 2}" y="218">the little computer</text>`;
+
+    // Position numbers that the board would otherwise hide, redrawn on top so he
+    // can still count along the row.
+    [5, 10].forEach(p => {
+      s += `<text class="extlbl" x="${X(p)}" y="${Y('J') - 12}" text-anchor="middle">${p}</text>`;
+      s += `<text class="extlbl" x="${X(p)}" y="${Y('A') + 18}" text-anchor="middle">${p}</text>`;
+    });
+
+    // Rail position 17 is only just reachable past the terminal blocks.
+    ['Pt', 'Ptn', 'Pb', 'Pbn'].forEach(r => {
+      s += `<circle class="exttight" cx="${X(17)}" cy="${Y(r)}" r="6.5"/>`;
+    });
     return s;
   }
 

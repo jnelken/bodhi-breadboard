@@ -21,9 +21,29 @@ extension board's silkscreen next to the breadboard hole it lands in.
   column to the `g` pins**.
 
 In the reference photo the breadboard is stood on end, so positions run top to
-bottom and `a`–`j` run left to right. Orientation is arbitrary — what matters is
-that the extension board covers **positions 13–32**, leaving 1–12 free at one end
-and 33–63 free at the other.
+bottom and `a`–`j` run left to right. Orientation is arbitrary.
+
+### Physical footprint — bigger than the pin spine
+
+**This is the part that is easy to get wrong.** The pins occupy positions 13–32,
+but the PCB itself covers considerably more of the breadboard:
+
+| Region | What's covered |
+|---|---|
+| **Positions 1–12** | **Everything** — all ten rows *and* both power rails. Completely unusable. |
+| **Positions 13–16** | Both power rails, under the screw-terminal blocks. |
+| **Position 17** | Rails only just reachable past the terminal blocks — treat as unusable. |
+| **Positions 13–32** | Columns `d`–`g` (the pin spine). Rows `a`–`c` and `h`–`j` stay clear. |
+
+So the genuinely free breadboard is:
+
+- **positions 18–63 on the power rails**
+- **positions 13–32 in rows `a`–`c` and `h`–`j`**
+- **positions 33–63 in every row**
+
+Positions 1–12 are **not** spare space. They look inviting on a diagram and are
+physically under the board — a layout that parks a component there cannot be
+built.
 
 ## Pin map
 
