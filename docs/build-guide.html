@@ -1,0 +1,895 @@
+<title>Bodhi's Signal Box — Build Guide</title>
+
+<style>
+  :root {
+    --bg: #F2F4F1;
+    --surface: #FFFFFF;
+    --surface-2: #E7EBE5;
+    --ink: #14201B;
+    --ink-2: #55635C;
+    --ink-3: #7C8A82;
+    --rule: #D3D9D0;
+    --rule-strong: #B6BFB6;
+    --brass: #8A6D14;
+    --copper: #A2451A;
+
+    --w-5v:  #C93A31;
+    --w-3v3: #C2610C;
+    --w-gnd: #2E3833;
+    --w-s1:  #A87C05;
+    --w-s2:  #2C6FC4;
+    --w-s3:  #1E8A52;
+
+    --pad: #FFFFFF;
+    --chip: #E7EBE5;
+
+    --font-display: "Avenir Next Condensed", "HelveticaNeue-CondensedBold", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
+    --font-body: "Charter", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+    --measure: 68ch;
+    --wide: 980px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0B1310;
+      --surface: #121C18;
+      --surface-2: #1A2620;
+      --ink: #E4EDE7;
+      --ink-2: #9DABA3;
+      --ink-3: #77857D;
+      --rule: #253229;
+      --rule-strong: #35463B;
+      --brass: #D9B356;
+      --copper: #E0813F;
+
+      --w-5v:  #E85F54;
+      --w-3v3: #E0813F;
+      --w-gnd: #9CAAA2;
+      --w-s1:  #E3B93C;
+      --w-s2:  #5C9BEA;
+      --w-s3:  #45C07E;
+
+      --pad: #1E2B24;
+      --chip: #1A2620;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0B1310;
+    --surface: #121C18;
+    --surface-2: #1A2620;
+    --ink: #E4EDE7;
+    --ink-2: #9DABA3;
+    --ink-3: #77857D;
+    --rule: #253229;
+    --rule-strong: #35463B;
+    --brass: #D9B356;
+    --copper: #E0813F;
+    --w-5v:  #E85F54;
+    --w-3v3: #E0813F;
+    --w-gnd: #9CAAA2;
+    --w-s1:  #E3B93C;
+    --w-s2:  #5C9BEA;
+    --w-s3:  #45C07E;
+    --pad: #1E2B24;
+    --chip: #1A2620;
+  }
+
+  :root[data-theme="light"] {
+    --bg: #F2F4F1;
+    --surface: #FFFFFF;
+    --surface-2: #E7EBE5;
+    --ink: #14201B;
+    --ink-2: #55635C;
+    --ink-3: #7C8A82;
+    --rule: #D3D9D0;
+    --rule-strong: #B6BFB6;
+    --brass: #8A6D14;
+    --copper: #A2451A;
+    --w-5v:  #C93A31;
+    --w-3v3: #C2610C;
+    --w-gnd: #2E3833;
+    --w-s1:  #A87C05;
+    --w-s2:  #2C6FC4;
+    --w-s3:  #1E8A52;
+    --pad: #FFFFFF;
+    --chip: #E7EBE5;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: var(--wide);
+    margin: 0 auto;
+    padding: 0 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ---- Typography ---- */
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-wrap: balance;
+    margin: 0;
+  }
+  h1 { font-size: clamp(2.6rem, 6vw, 4.1rem); line-height: 1.02; letter-spacing: -0.01em; }
+  h2 { font-size: clamp(1.6rem, 3.2vw, 2.15rem); line-height: 1.1; }
+  h3 { font-size: 1.2rem; line-height: 1.25; letter-spacing: 0.01em; }
+
+  p { margin: 0; max-width: var(--measure); }
+  a { color: var(--copper); }
+  a:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--brass);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--brass);
+  }
+
+  code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+  code {
+    background: var(--surface-2);
+    padding: 0.1em 0.36em;
+    border-radius: 3px;
+  }
+
+  /* ---- Structure ---- */
+  header.masthead {
+    padding: 72px 0 40px;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .masthead .lede { font-size: 1.2rem; color: var(--ink-2); max-width: 56ch; }
+  .specline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+  .specline b { color: var(--ink-2); font-weight: 500; }
+
+  section {
+    padding: 56px 0;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  section:last-of-type { border-bottom: none; }
+  .sec-head { display: flex; flex-direction: column; gap: 8px; }
+
+  /* ---- Figures ---- */
+  figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .figbox {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 20px;
+    overflow-x: auto;
+  }
+  .figbox svg { display: block; min-width: 560px; width: 100%; height: auto; }
+  figcaption, .note {
+    font-size: 0.86rem;
+    color: var(--ink-2);
+    max-width: var(--measure);
+  }
+
+  /* SVG shared styles */
+  .wire { fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .w5v  { stroke: var(--w-5v); }
+  .w3v3 { stroke: var(--w-3v3); }
+  .wgnd { stroke: var(--w-gnd); }
+  .ws1  { stroke: var(--w-s1); }
+  .ws2  { stroke: var(--w-s2); }
+  .ws3  { stroke: var(--w-s3); }
+
+  .part { fill: var(--pad); stroke: var(--ink); stroke-width: 1.6; }
+  .pad  { fill: var(--chip); stroke: var(--rule-strong); stroke-width: 1.4; }
+  .gpio { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+  .dot  { fill: var(--ink); }
+
+  .t     { font-family: var(--font-mono); font-size: 12.5px; fill: var(--ink); }
+  .t-sm  { font-family: var(--font-mono); font-size: 11px; fill: var(--ink-2); }
+  .t-val { font-family: var(--font-mono); font-size: 12px; fill: var(--ink); font-weight: 600; }
+  .t-mid { text-anchor: middle; }
+  .t-end { text-anchor: end; }
+
+  /* ---- Legend ---- */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--ink-2);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .swatch { width: 18px; height: 3px; border-radius: 2px; flex: none; }
+
+  /* ---- Callout ---- */
+  .callout {
+    border-left: 3px solid var(--brass);
+    padding: 4px 0 4px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .callout .label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brass);
+  }
+
+  /* ---- GPIO budget grid ---- */
+  .budget {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+    gap: 6px;
+  }
+  .gp {
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 7px 6px 6px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.25;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .gp .num { font-weight: 600; letter-spacing: 0.02em; }
+  .gp .why { font-size: 0.62rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+  .gp.taken { opacity: 0.5; }
+  .gp.free {
+    border-color: var(--brass);
+    border-width: 2px;
+    background: color-mix(in srgb, var(--brass) 9%, var(--surface));
+  }
+  .gp.free .why { color: var(--brass); }
+
+  /* ---- Tables ---- */
+  .tablewrap { overflow-x: auto; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 520px;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px 10px 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    font-weight: 500;
+    border-bottom-color: var(--rule-strong);
+  }
+  td.m { font-family: var(--font-mono); font-size: 0.84rem; white-space: nowrap; }
+
+  /* ---- Pigtail cards ---- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--surface);
+    padding: 16px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card h3 { font-size: 1.05rem; }
+  .card .sub {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .pins { display: flex; flex-direction: column; gap: 5px; }
+  .pin {
+    display: grid;
+    grid-template-columns: 12px 62px 1fr;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+  .pin .bul { width: 10px; height: 10px; border-radius: 50%; }
+  .pin .to { color: var(--ink-2); }
+  .card .plays {
+    border-top: 1px solid var(--rule);
+    padding-top: 11px;
+    font-size: 0.86rem;
+    color: var(--ink-2);
+    max-width: none;
+  }
+  .card .plays b { color: var(--ink); font-weight: 600; }
+
+  /* ---- Steps ---- */
+  ol.steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  ol.steps li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 14px;
+    max-width: var(--measure);
+  }
+  ol.steps li::before {
+    content: counter(step);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--brass);
+    border: 1px solid var(--brass);
+    border-radius: 50%;
+    width: 25px; height: 25px;
+    display: grid;
+    place-items: center;
+    margin-top: 1px;
+  }
+
+  ul.plain { margin: 0; padding-left: 1.1em; max-width: var(--measure); }
+  ul.plain li { margin-bottom: 7px; }
+
+  pre {
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+  pre .c { color: var(--ink-3); }
+
+  details {
+    border-top: 1px solid var(--rule);
+    padding: 14px 0;
+  }
+  summary { cursor: pointer; font-weight: 600; font-family: var(--font-display); font-size: 1.05rem; }
+  details p { margin-top: 10px; color: var(--ink-2); }
+
+  footer {
+    padding: 40px 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--ink-3);
+    line-height: 1.8;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">Breadboard build guide</div>
+    <h1>Bodhi's Signal Box</h1>
+    <p class="lede">Plug in one sensor. The box works out what it is and starts a game that fits it. Swap the sensor and it changes over on its own — no reset, no reflashing, no grown-up.</p>
+    <div class="specline">
+      <span><b>Board</b> Freenove ESP32-WROVER CAM</span>
+      <span><b>Kit</b> Ultimate Starter Kit FNK0047</span>
+      <span><b>Chip</b> ESP32-D0WD-V3 · 4 MB</span>
+      <span><b>Port</b> /dev/cu.usbserial-210</span>
+    </div>
+  </header>
+
+  <!-- ================= CAMERA ================= -->
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Step zero</div>
+      <h2>Unplug the camera first</h2>
+    </div>
+    <p>The OV2640 claims fourteen GPIOs. Once you also set aside the PSRAM, the flash, the microSD slot and the programming UART, four pins are left on the whole board — not enough for a sensor port, four lights and a buzzer.</p>
+    <p>The camera lifts out of its socket and clips back in whenever you want it. Nothing here is soldered.</p>
+
+    <figure>
+      <div class="budget">
+        <div class="gp taken"><span class="num">0</span><span class="why">boot</span></div>
+        <div class="gp taken"><span class="num">1</span><span class="why">uart tx</span></div>
+        <div class="gp taken"><span class="num">2</span><span class="why">sd card</span></div>
+        <div class="gp taken"><span class="num">3</span><span class="why">uart rx</span></div>
+        <div class="gp taken"><span class="num">4</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">5</span><span class="why">camera</span></div>
+        <div class="gp free"><span class="num">12</span><span class="why">free</span></div>
+        <div class="gp free"><span class="num">13</span><span class="why">free</span></div>
+        <div class="gp taken"><span class="num">14</span><span class="why">sd card</span></div>
+        <div class="gp taken"><span class="num">15</span><span class="why">sd card</span></div>
+        <div class="gp taken"><span class="num">16</span><span class="why">psram</span></div>
+        <div class="gp taken"><span class="num">17</span><span class="why">psram</span></div>
+        <div class="gp taken"><span class="num">18</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">19</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">21</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">22</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">23</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">25</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">26</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">27</span><span class="why">camera</span></div>
+        <div class="gp free"><span class="num">32</span><span class="why">free</span></div>
+        <div class="gp free"><span class="num">33</span><span class="why">free</span></div>
+        <div class="gp taken"><span class="num">34</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">35</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">36</span><span class="why">camera</span></div>
+        <div class="gp taken"><span class="num">39</span><span class="why">camera</span></div>
+      </div>
+      <figcaption>Every GPIO broken out on the board, and what claims it with the camera fitted. Your board's silkscreen says the same thing in shorthand: <code>-</code> camera, <code>~</code> SD card, <code>*</code> PSRAM.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <div class="label">Why the port lives on 13, 32, 33</div>
+      <p>Those four survivors are exactly where the sensor port and buzzer go. That is deliberate: if you ever refit the camera, it costs you the lights and the display, but the plug-and-play port keeps working.</p>
+    </div>
+  </section>
+
+  <!-- ================= THE PORT ================= -->
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Build 1 of 2 · the heart of it</div>
+      <h2>The port</h2>
+    </div>
+    <p>Six labelled rows on the breadboard. Three of them carry resistors, and those resistors are the whole reason a five-year-old can plug things in unsupervised.</p>
+
+    <figure>
+      <div class="figbox">
+        <svg viewBox="0 0 760 476" role="img" aria-label="Schematic of the six-row sensor port showing 1k on S1 and 10k/20k dividers on S2 and S3">
+          <!-- 5V -->
+          <rect class="pad" x="30" y="16" width="76" height="26" rx="3"/>
+          <text class="t t-mid" x="68" y="34">5V</text>
+          <path class="wire w5v" d="M106 29 H660"/>
+          <text class="t-sm" x="668" y="33">board 5V</text>
+
+          <!-- 3V3 -->
+          <rect class="pad" x="30" y="56" width="76" height="26" rx="3"/>
+          <text class="t t-mid" x="68" y="74">3V3</text>
+          <path class="wire w3v3" d="M106 69 H660"/>
+          <text class="t-sm" x="668" y="73">board 3V3</text>
+
+          <!-- GND -->
+          <rect class="pad" x="30" y="96" width="76" height="26" rx="3"/>
+          <text class="t t-mid" x="68" y="114">GND</text>
+          <path class="wire wgnd" d="M106 109 H660"/>
+          <text class="t-sm" x="668" y="113">board GND</text>
+
+          <!-- divider rule -->
+          <path d="M30 142 H730" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 4" fill="none"/>
+
+          <!-- S1 -->
+          <rect class="pad" x="30" y="164" width="76" height="26" rx="3"/>
+          <text class="t t-mid" x="68" y="182">S1</text>
+          <path class="wire ws1" d="M106 177 H286"/>
+          <rect class="part" x="286" y="166" width="66" height="22" rx="2"/>
+          <text class="t-val t-mid" x="319" y="181">1k</text>
+          <path class="wire ws1" d="M352 177 H596"/>
+          <rect class="gpio" x="596" y="163" width="80" height="28" rx="14"/>
+          <text class="t t-mid" x="636" y="182">GPIO 13</text>
+
+          <!-- S2 -->
+          <rect class="pad" x="30" y="246" width="76" height="26" rx="3"/>
+          <text class="t t-mid" x="68" y="264">S2</text>
+          <path class="wire ws2" d="M106 259 H256"/>
+          <rect class="part" x="256" y="248" width="66" height="22" rx="2"/>
+          <text class="t-val t-mid" x="289" y="263">10k</text>
+          <path class="wire ws2" d="M322 259 H596"/>
+          <circle class="dot" cx="430" cy="259" r="4"/>
+          <rect class="gpio" x="596" y="245" width="80" height="28" rx="14"/>
+          <text class="t t-mid" x="636" y="264">GPIO 32</text>
+          <!-- shunt -->
+          <path class="wire wgnd" d="M430 259 V286"/>
+          <rect class="part" x="419" y="286" width="22" height="58" rx="2"/>
+          <text class="t-val" x="452" y="320">20k</text>
+          <path class="wire wgnd" d="M430 344 V362"/>
+          <path class="wire wgnd" d="M410 362 H450 M416 369 H444 M423 376 H437"/>
+
+          <!-- S3 -->
+          <rect class="pad" x="30" y="392" width="76" height="26" rx="3"/>
+          <text class="t t-mid" x="68" y="410">S3</text>
+          <path class="wire ws3" d="M106 405 H256"/>
+          <rect class="part" x="256" y="394" width="66" height="22" rx="2"/>
+          <text class="t-val t-mid" x="289" y="409">10k</text>
+          <path class="wire ws3" d="M322 405 H596"/>
+          <circle class="dot" cx="530" cy="405" r="4"/>
+          <rect class="gpio" x="596" y="391" width="80" height="28" rx="14"/>
+          <text class="t t-mid" x="636" y="410">GPIO 33</text>
+          <!-- shunt -->
+          <path class="wire wgnd" d="M530 405 V424"/>
+          <rect class="part" x="519" y="424" width="22" height="30" rx="2"/>
+          <text class="t-val" x="552" y="443">20k</text>
+          <path class="wire wgnd" d="M530 454 V462"/>
+          <path class="wire wgnd" d="M510 462 H550 M516 469 H544"/>
+
+          <text class="t-sm" x="30" y="228">module side</text>
+          <text class="t-sm t-end" x="730" y="228">board side</text>
+        </svg>
+      </div>
+      <figcaption>No 20 kΩ in the kit? Two 10 kΩ in series is the same thing. S2 and S3 are wired identically — build one, then copy it.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <div class="label">Don't skip the resistors</div>
+      <p><b>The 10 k / 20 k dividers</b> mean any kit module, 3.3 V or 5 V, lands safely inside the ESP32's input range. There is no way to hurt the board by plugging something in wrong. Don't substitute 1 kΩ / 2 kΩ — that loads the joystick's 10 kΩ pot hard enough to drag its centre reading down to about a quarter of full scale, and the box stops recognising it.</p>
+      <p><b>The 1 kΩ on S1</b> matters because S1 is sometimes an output — the ultrasonic's trigger — and sometimes an input, the joystick's click, which is a switch straight to ground. The box drives that trigger while it is still working out what's attached, so without the resistor, probing a joystick with its button held down would be a driven pin shorted to ground.</p>
+    </div>
+
+    <p>One more consequence worth knowing: because everything arrives through a divider, a 3.3 V motion sensor lands at 2.2 V — below the ESP32's digital-HIGH threshold of about 2.48 V. That is why the code reads S2 and S3 as <em>analog</em> values and compares numbers, rather than trusting <code>digitalRead</code>.</p>
+  </section>
+
+  <!-- ================= LIGHTS AND SOUND ================= -->
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Build 2 of 2 · leave permanently wired</div>
+      <h2>Lights and sound</h2>
+    </div>
+    <p>Four LEDs make the meter Bodhi reads, and the buzzer sings the pitch that tracks it. These never come off the breadboard.</p>
+
+    <figure>
+      <div class="figbox">
+        <svg viewBox="0 0 700 250" role="img" aria-label="Four LEDs, each from a GPIO through a 220 ohm resistor to ground">
+          <g>
+            <rect class="gpio" x="20" y="16" width="80" height="28" rx="14"/>
+            <text class="t t-mid" x="60" y="35">GPIO 23</text>
+            <path class="wire ws1" d="M100 30 H188"/>
+            <rect class="part" x="188" y="19" width="60" height="22" rx="2"/>
+            <text class="t-val t-mid" x="218" y="34">220</text>
+            <path class="wire ws1" d="M248 30 H322"/>
+            <path class="part" d="M322 16 L322 44 L350 30 Z"/>
+            <path class="wire wgnd" d="M350 16 V44"/>
+            <path class="wire wgnd" d="M350 30 H600"/>
+            <path class="wire wgnd" d="M357 12 L369 4 M363 16 L375 8" stroke-width="1.5"/>
+            <text class="t-sm" x="392" y="26">LED 1</text>
+          </g>
+          <g>
+            <rect class="gpio" x="20" y="68" width="80" height="28" rx="14"/>
+            <text class="t t-mid" x="60" y="87">GPIO 19</text>
+            <path class="wire ws1" d="M100 82 H188"/>
+            <rect class="part" x="188" y="71" width="60" height="22" rx="2"/>
+            <text class="t-val t-mid" x="218" y="86">220</text>
+            <path class="wire ws1" d="M248 82 H322"/>
+            <path class="part" d="M322 68 L322 96 L350 82 Z"/>
+            <path class="wire wgnd" d="M350 68 V96"/>
+            <path class="wire wgnd" d="M350 82 H600"/>
+            <path class="wire wgnd" d="M357 64 L369 56 M363 68 L375 60" stroke-width="1.5"/>
+            <text class="t-sm" x="392" y="78">LED 2</text>
+          </g>
+          <g>
+            <rect class="gpio" x="20" y="120" width="80" height="28" rx="14"/>
+            <text class="t t-mid" x="60" y="139">GPIO 18</text>
+            <path class="wire ws1" d="M100 134 H188"/>
+            <rect class="part" x="188" y="123" width="60" height="22" rx="2"/>
+            <text class="t-val t-mid" x="218" y="138">220</text>
+            <path class="wire ws1" d="M248 134 H322"/>
+            <path class="part" d="M322 120 L322 148 L350 134 Z"/>
+            <path class="wire wgnd" d="M350 120 V148"/>
+            <path class="wire wgnd" d="M350 134 H600"/>
+            <path class="wire wgnd" d="M357 116 L369 108 M363 120 L375 112" stroke-width="1.5"/>
+            <text class="t-sm" x="392" y="130">LED 3</text>
+          </g>
+          <g>
+            <rect class="gpio" x="20" y="172" width="80" height="28" rx="14"/>
+            <text class="t t-mid" x="60" y="191">GPIO 4</text>
+            <path class="wire ws1" d="M100 186 H188"/>
+            <rect class="part" x="188" y="175" width="60" height="22" rx="2"/>
+            <text class="t-val t-mid" x="218" y="190">220</text>
+            <path class="wire ws1" d="M248 186 H322"/>
+            <path class="part" d="M322 172 L322 200 L350 186 Z"/>
+            <path class="wire wgnd" d="M350 172 V200"/>
+            <path class="wire wgnd" d="M350 186 H600"/>
+            <path class="wire wgnd" d="M357 168 L369 160 M363 172 L375 164" stroke-width="1.5"/>
+            <text class="t-sm" x="392" y="182">LED 4</text>
+          </g>
+          <!-- ground rail -->
+          <path class="wire wgnd" d="M600 30 V210"/>
+          <path class="wire wgnd" d="M580 210 H620 M586 218 H614 M593 226 H607"/>
+          <text class="t-sm t-mid" x="600" y="244">GND</text>
+          <text class="t-sm" x="20" y="222">long leg (anode) toward the resistor</text>
+        </svg>
+      </div>
+      <figcaption>Bottom LED is number 1 — the meter fills upward from it.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="figbox">
+        <svg viewBox="0 0 560 210" role="img" aria-label="Buzzer driven by an S8050 transistor from GPIO 12 through a 1k base resistor">
+          <rect class="gpio" x="20" y="88" width="80" height="28" rx="14"/>
+          <text class="t t-mid" x="60" y="107">GPIO 12</text>
+          <path class="wire ws1" d="M100 102 H168"/>
+          <rect class="part" x="168" y="91" width="60" height="22" rx="2"/>
+          <text class="t-val t-mid" x="198" y="106">1k</text>
+          <path class="wire ws1" d="M228 102 H286"/>
+
+          <!-- transistor -->
+          <circle class="part" cx="330" cy="102" r="34"/>
+          <path class="wire wgnd" d="M286 102 H314"/>
+          <path class="wire wgnd" d="M314 82 V122" stroke-width="3"/>
+          <path class="wire wgnd" d="M314 92 L348 72"/>
+          <path class="wire wgnd" d="M314 112 L348 132"/>
+          <path class="wire wgnd" d="M348 72 V52"/>
+          <path class="wire wgnd" d="M348 132 V158"/>
+          <text class="t-sm" x="372" y="106">S8050</text>
+          <text class="t-sm" x="252" y="94">base</text>
+
+          <!-- emitter to ground -->
+          <path class="wire wgnd" d="M328 158 H368"/>
+          <path class="wire wgnd" d="M334 166 H362 M341 174 H355"/>
+          <text class="t-sm t-mid" x="348" y="192">GND</text>
+
+          <!-- collector to buzzer to 5V -->
+          <path class="wire wgnd" d="M348 52 H406"/>
+          <rect class="part" x="406" y="34" width="58" height="36" rx="3"/>
+          <text class="t-val t-mid" x="435" y="57">BUZZ</text>
+          <path class="wire w5v" d="M464 52 H520"/>
+          <path class="wire w5v" d="M520 52 V34"/>
+          <path class="wire w5v" d="M506 34 H534"/>
+          <text class="t-sm t-mid" x="520" y="24">5V</text>
+        </svg>
+      </div>
+      <figcaption>Use the <b>passive</b> buzzer — the one with the open bottom. The active buzzer has a fixed internal oscillator, so it can only beep at a single pitch and can't play the per-sensor jingles or the pitch that tracks the meter.</figcaption>
+    </figure>
+
+    <div class="legend">
+      <span><i class="swatch" style="background:var(--w-5v)"></i> 5 V</span>
+      <span><i class="swatch" style="background:var(--w-3v3)"></i> 3.3 V</span>
+      <span><i class="swatch" style="background:var(--w-gnd)"></i> ground / signal</span>
+      <span><i class="swatch" style="background:var(--w-s1)"></i> S1 · GPIO 13</span>
+      <span><i class="swatch" style="background:var(--w-s2)"></i> S2 · GPIO 32</span>
+      <span><i class="swatch" style="background:var(--w-s3)"></i> S3 · GPIO 33</span>
+    </div>
+  </section>
+
+  <!-- ================= PIGTAILS ================= -->
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">One per module</div>
+      <h2>Make the pigtails</h2>
+    </div>
+    <p>Bundle each module's wires into a single connector so Bodhi pushes in one plug, not five loose jumpers. This is the difference between a toy he can use alone and one that needs you.</p>
+
+    <div class="cards">
+      <div class="card">
+        <div>
+          <h3>Ultrasonic</h3>
+          <div class="sub">HC-SR04 · the binoculars</div>
+        </div>
+        <div class="pins">
+          <div class="pin"><i class="bul" style="background:var(--w-5v)"></i><span>VCC</span><span class="to">→ 5V</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-gnd)"></i><span>GND</span><span class="to">→ GND</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-s1)"></i><span>Trig</span><span class="to">→ S1</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-s2)"></i><span>Echo</span><span class="to">→ S2</span></div>
+        </div>
+        <p class="plays"><b>Reach the Target.</b> Move your hand closer to push the lights up.</p>
+      </div>
+
+      <div class="card">
+        <div>
+          <h3>Joystick</h3>
+          <div class="sub">dual axis with click</div>
+        </div>
+        <div class="pins">
+          <div class="pin"><i class="bul" style="background:var(--w-5v)"></i><span>+5V</span><span class="to">→ 5V</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-gnd)"></i><span>GND</span><span class="to">→ GND</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-s1)"></i><span>SW</span><span class="to">→ S1</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-s2)"></i><span>VRx</span><span class="to">→ S2</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-s3)"></i><span>VRy</span><span class="to">→ S3</span></div>
+        </div>
+        <p class="plays"><b>Reach the Target.</b> Push the stick up and down.</p>
+      </div>
+
+      <div class="card">
+        <div>
+          <h3>Motion</h3>
+          <div class="sub">HC-SR501 · the white dome</div>
+        </div>
+        <div class="pins">
+          <div class="pin"><i class="bul" style="background:var(--w-5v)"></i><span>VCC</span><span class="to">→ 5V</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-gnd)"></i><span>GND</span><span class="to">→ GND</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-s3)"></i><span>OUT</span><span class="to">→ S3</span></div>
+        </div>
+        <p class="plays"><b>Wave on Green.</b> Wait for the countdown, then wave fast.</p>
+      </div>
+
+      <div class="card">
+        <div>
+          <h3>Photoresistor</h3>
+          <div class="sub">light level module</div>
+        </div>
+        <div class="pins">
+          <div class="pin"><i class="bul" style="background:var(--w-5v)"></i><span>VCC</span><span class="to">→ 5V</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-gnd)"></i><span>GND</span><span class="to">→ GND</span></div>
+          <div class="pin"><i class="bul" style="background:var(--w-s2)"></i><span>AO</span><span class="to">→ S2</span></div>
+        </div>
+        <p class="plays"><b>Reach the Target.</b> Cup your hand over it to fill the meter.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HOW IT KNOWS ================= -->
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">What happens when he plugs one in</div>
+      <h2>How the box knows</h2>
+    </div>
+    <p>Detection runs in priority order, most specific first, and repeats whenever the current module stops answering. Whatever it lands on picks the game — a magnitude game for anything that reports "how much", a timing game for anything that can only say yes or no.</p>
+
+    <figure>
+      <div class="figbox">
+        <svg viewBox="0 0 900 108" role="img" aria-label="Signal flow from module through driver, gate and signal to game">
+          <g>
+            <rect class="pad" x="8" y="30" width="128" height="44" rx="4"/>
+            <text class="t t-mid" x="72" y="51">module</text>
+            <text class="t-sm t-mid" x="72" y="66">volts</text>
+          </g>
+          <path class="wire wgnd" d="M144 52 H176 M168 46 L176 52 L168 58"/>
+          <g>
+            <rect class="pad" x="184" y="30" width="150" height="44" rx="4"/>
+            <text class="t t-mid" x="259" y="51">InputDriver</text>
+            <text class="t-sm t-mid" x="259" y="66">raw numbers</text>
+          </g>
+          <path class="wire wgnd" d="M342 52 H374 M366 46 L374 52 L366 58"/>
+          <g>
+            <rect class="part" x="382" y="30" width="150" height="44" rx="4"/>
+            <text class="t t-mid" x="457" y="51">Gate</text>
+            <text class="t-sm t-mid" x="457" y="66">smooth · debounce</text>
+          </g>
+          <path class="wire wgnd" d="M540 52 H572 M564 46 L572 52 L564 58"/>
+          <g>
+            <rect class="pad" x="580" y="30" width="150" height="44" rx="4"/>
+            <text class="t t-mid" x="655" y="51">Signal</text>
+            <text class="t-sm t-mid" x="655" y="66">level · active</text>
+          </g>
+          <path class="wire wgnd" d="M738 52 H770 M762 46 L770 52 L762 58"/>
+          <g>
+            <rect class="pad" x="778" y="30" width="114" height="44" rx="4"/>
+            <text class="t t-mid" x="835" y="51">Game</text>
+            <text class="t-sm t-mid" x="835" y="66">plays</text>
+          </g>
+          <text class="t-sm" x="184" y="20">knows sensors</text>
+          <text class="t-sm" x="580" y="20">knows neither</text>
+          <text class="t-sm t-end" x="892" y="20">knows games</text>
+        </svg>
+      </div>
+      <figcaption>Drivers know about sensors. Games know about <code>Signal</code>. Nothing knows about both — which is why swapping a module never touches a line of game code.</figcaption>
+    </figure>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Order</th><th>Module</th><th>How it's recognised</th><th>Jingle</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="m">1</td><td class="m">Ultrasonic</td><td>Answers an active trigger pulse — nothing else can imitate that</td><td>rising three notes</td></tr>
+          <tr><td class="m">2</td><td class="m">Joystick</td><td>Both analog lines alive, steady, and sitting near centre</td><td>bouncy four notes</td></tr>
+          <tr><td class="m">3</td><td class="m">Photoresistor</td><td>One analog line alive, the other quiet</td><td>two chirps</td></tr>
+          <tr><td class="m">4</td><td class="m">Motion</td><td>Its output goes high — <b>the first wave is the detection</b></td><td>low–high–mid</td></tr>
+          <tr><td class="m">5</td><td class="m">Nothing</td><td>Always matches, so the box always boots into something</td><td>sleepy two notes</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <div class="label">Why the motion sensor is detected by waving</div>
+      <p>An idle PIR is genuinely indistinguishable from an empty port through a divider — the ESP32's internal pull-up is only specified to 30–80 kΩ, and across that tolerance the two cases overlap. Rather than ship a threshold that works on one board and fails on the next, the box waits for the sensor's output to actually fire. Bodhi plugs in the dome, waves at it, and it announces itself. That can't false-positive, and it reads as magic rather than as a workaround.</p>
+    </div>
+  </section>
+
+  <!-- ================= FLASH ================= -->
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Bring it up</div>
+      <h2>Flash and check</h2>
+    </div>
+    <ol class="steps">
+      <li>Wire the lights, the buzzer and the port. Leave the sensor port empty for now.</li>
+      <li>Put the diagnostic sketch on the board and watch what it sees.</li>
+      <li>Plug each module in one at a time and confirm the scanner names it correctly.</li>
+      <li>Flash the game. Plug something in and play.</li>
+    </ol>
+
+<pre><span class="c"># diagnostic first — prints what every port pin is showing</span>
+./flash.sh PortScanner
+./monitor.sh
+
+<span class="c"># then the game</span>
+./flash.sh</pre>
+
+    <p>With nothing plugged in, the scanner should read like this — both signal lines pulled to zero by their dividers, no echo, and an honest verdict:</p>
+
+<pre>S2 pd=   0 (0.00V) pu=1290 | S3 pd=   0 (0.00V) pu=1310 | S1=high | echo=    0 us
+   -> nothing detected (if this is the PIR, wave at it)</pre>
+
+    <p class="note">The <code>pu</code> figures land near 1300 once the dividers are fitted — the internal pull-up fighting your 20 kΩ to ground. Before you fit them, a bare pin reads about 3500 instead. Either way, <code>pd</code> should be zero.</p>
+  </section>
+
+  <!-- ================= TROUBLE ================= -->
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">If something's off</div>
+      <h2>Troubleshooting</h2>
+    </div>
+
+    <details>
+      <summary>The board won't boot with a module plugged in</summary>
+      <p>That's a pin conflict, not a loose wire. Check the camera is unplugged, and check nothing is wired to GPIO 0, 2, 5 or 15 — a module holding one of those at the wrong level stops the ESP32 booting at all.</p>
+    </details>
+
+    <details>
+      <summary>The joystick is detected as a light sensor</summary>
+      <p>Almost always the divider values. At 1 kΩ / 2 kΩ the load pulls the stick's resting centre far enough off mid-scale that the check fails. Use 10 kΩ / 20 kΩ.</p>
+    </details>
+
+    <details>
+      <summary>Covering the photoresistor empties the meter instead of filling it</summary>
+      <p>Its onboard divider is wired the other way round. Flip <code>kCoveringRaises</code> at the top of <code>DriverLight.cpp</code> — that's the whole fix.</p>
+    </details>
+
+    <details>
+      <summary>The ultrasonic gives up after a few seconds</summary>
+      <p>It decides it has been unplugged after a long run of unanswered pings. Aim it at the table or a wall rather than across an open room, so it always has something to hear.</p>
+    </details>
+
+    <details>
+      <summary>Upload dies partway with "the chip stopped responding"</summary>
+      <p>The USB-serial adapter can't sustain the default 921600 baud. <code>flash.sh</code> already retries at 115200 on its own, so let it — it usually gets through on the second attempt.</p>
+    </details>
+
+    <details>
+      <summary>The buzzer only makes one pitch</summary>
+      <p>That's the active buzzer. Swap it for the passive one, which has an open bottom rather than a sealed sticker.</p>
+    </details>
+  </section>
+
+  <footer>
+    Bodhi's Signal Box · pin map and rationale in CLAUDE.md · wiring and play in README.md<br>
+    Adding another of the kit's sensors is one driver file and one line in the registry — never a change to a game.
+  </footer>
+
+</div>
