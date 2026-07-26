@@ -333,8 +333,8 @@
     const x = hx(EXT_FROM) - 7, w = (EXT_TO - EXT_FROM) * PITCH + 14;
     let s = `<path class="extbody" d="${d}"/>`;
     s += `<text class="exttxt" x="${(xA + xB) / 2}" y="${(spineT + spineB) / 2}">covers the whole left end</text>`;
-    s += `<text class="exttxt" x="${(hx(13) + hx(16)) / 2}" y="32">5V GND</text>`;
-    s += `<text class="exttxt" x="${(hx(13) + hx(16)) / 2}" y="268">3V3 GND</text>`;
+    s += `<text class="exttxt" x="${(hx(13) + hx(16)) / 2}" y="32">3V3 GND</text>`;
+    s += `<text class="exttxt" x="${(hx(13) + hx(16)) / 2}" y="268">5V GND</text>`;
     for (let i = 0; i < D_LABELS.length; i++) {
       const p = EXT_FROM + i;
       const on = D_USED.has(p);

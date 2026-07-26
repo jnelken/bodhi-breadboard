@@ -110,9 +110,11 @@ never use GPIO 16 or 17 on this hardware.
 - **On the breadboard:** 5V at positions 31–32 (column `d`), 3.3V at 13 and
   28–30 (column `d`), and GND at position 26 (column `d`) plus 13, 19 and 28–32
   (column `g`). Plenty of both rails without running long jumpers.
-- **Screw terminals**, two pairs on the extension board's outer corners:
-  `5V` / `GND` on one side, `EXT-3.3V` / `GND` on the other — for powering the
-  rig from something other than USB.
+- **Screw terminals**, one pair over each power rail, reaching from position 13
+  out to about 16. With the board laid out horizontally and the extension board
+  on the left: **`EXT-3.3V` / `GND` is the top pair, `5V` / `GND` is the bottom
+  pair.** (Confirmed against the physical board — the diagrams originally had
+  these reversed.) They exist for powering the rig from something other than USB.
 
 ## What this changes for this project
 

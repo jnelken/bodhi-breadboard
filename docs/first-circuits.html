@@ -297,11 +297,12 @@
                `V${spineB}`, `H${xB}`, `V${railB}`, `H${xC}`, `V${yB}`, `H${xA}`, 'Z'].join(' ');
     let s = `<path class="extbody" d="${d}" filter="url(#extshade)"/>`;
 
-    // Screw terminals, sitting over the rails
+    // Screw terminals, sitting over the rails. 3.3 V is the top pair, 5 V the
+    // bottom pair — confirmed against the board.
     s += `<rect class="extbody" x="${X(13) - 5}" y="22" width="${X(16) - X(13) + 10}" height="30" rx="2"/>`;
-    s += `<text class="exttxt" x="${(X(13) + X(16)) / 2}" y="41">5V GND</text>`;
+    s += `<text class="exttxt" x="${(X(13) + X(16)) / 2}" y="41">3V3 GND</text>`;
     s += `<rect class="extbody" x="${X(13) - 5}" y="380" width="${X(16) - X(13) + 10}" height="30" rx="2"/>`;
-    s += `<text class="exttxt" x="${(X(13) + X(16)) / 2}" y="399">3V3 GND</text>`;
+    s += `<text class="exttxt" x="${(X(13) + X(16)) / 2}" y="399">5V GND</text>`;
 
     // Pin rows: this is where it actually plugs in — columns d and g
     for (let p = EXT_FROM; p <= EXT_TO; p++) {
