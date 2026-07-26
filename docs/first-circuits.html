@@ -163,6 +163,12 @@
   /* The extension board is a real dark PCB sitting on top of the breadboard, so
      it keeps the same colours in both themes — it reads as an object, not a
      diagram element. */
+  .zone { fill: none; stroke: var(--glow); stroke-width: 3; stroke-dasharray: 11 8; }
+  .panel { fill: var(--surface); stroke: var(--rule-strong); stroke-width: 1.5; }
+  .ptitle { font-family: var(--font-display); font-size: 27px; font-weight: 600; fill: var(--ink); text-anchor: middle; }
+  .pcount { font-family: var(--font-mono); font-size: 23px; font-weight: 700; fill: var(--ink); text-anchor: middle; }
+  .plabel { font-family: var(--font-mono); font-size: 13px; fill: var(--ink-2); text-anchor: middle; }
+
   .extbody { fill: #1E2723; stroke: #55655B; stroke-width: 1.4; }
   .extpad { fill: #C9A227; }
   .extlbl { font-family: var(--font-mono); font-size: 9px; fill: #A9B8AE; }
@@ -346,7 +352,71 @@
     return `<path class="wire-out" d="${d}" stroke-width="8"/><path class="wire-in" d="${d}" stroke="${color}" stroke-width="5.4"/>`;
   }
 
+  // A parts inventory, the way a LEGO booklet opens — pictures and counts, so
+  // he can gather his own pieces without being able to read.
+  const PARTS = [
+    { k:'r', n:4, label:'resistor' },
+    { k:'led', n:1, tone:'#D94F3D', label:'red light' },
+    { k:'led', n:1, tone:'#E0A32E', label:'yellow light' },
+    { k:'led', n:1, tone:'#3E9E5A', label:'green light' },
+    { k:'led', n:1, tone:'#3F7FD0', label:'blue light' },
+    { k:'pot', n:1, label:'knob' },
+    { k:'w', n:2, tone:'var(--w-5v)', label:'red wire' },
+    { k:'w', n:5, tone:'var(--w-gnd)', label:'black wire' },
+    { k:'w', n:1, tone:'var(--w-s1)', label:'yellow wire' }
+  ];
+
+  function partIcon(p, cx, cy) {
+    if (p.k === 'r') {
+      // 220 ohm: red, red, brown
+      let s = `<line class="lead" x1="${cx-46}" y1="${cy}" x2="${cx+46}" y2="${cy}"/>`;
+      s += `<rect class="rbody" x="${cx-27}" y="${cy-11}" width="54" height="22" rx="4"/>`;
+      ['#C0392B', '#C0392B', '#7B4A21'].forEach((c, i) => {
+        s += `<rect x="${cx - 17 + i * 13}" y="${cy-11}" width="6" height="22" fill="${c}"/>`;
+      });
+      return s;
+    }
+    if (p.k === 'led') {
+      return `<line class="lead" x1="${cx-7}" y1="${cy+6}" x2="${cx-7}" y2="${cy+30}"/>` +
+             `<line class="lead" x1="${cx+7}" y1="${cy+6}" x2="${cx+7}" y2="${cy+22}"/>` +
+             `<circle cx="${cx}" cy="${cy-2}" r="17" fill="${p.tone}" stroke="var(--ink)" stroke-width="1.8"/>`;
+    }
+    if (p.k === 'pot') {
+      let s = `<circle cx="${cx}" cy="${cy-4}" r="20" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.8"/>`;
+      s += `<line class="lead" x1="${cx}" y1="${cy-4}" x2="${cx+11}" y2="${cy-15}"/>`;
+      [-13, 0, 13].forEach(dx => {
+        s += `<line class="lead" x1="${cx+dx}" y1="${cy+16}" x2="${cx+dx}" y2="${cy+32}"/>`;
+      });
+      return s;
+    }
+    // jumper wire
+    return `<path class="wire-out" d="M${cx-46} ${cy+12} Q${cx} ${cy-26} ${cx+46} ${cy+12}" stroke-width="11" fill="none"/>` +
+           `<path class="wire-in" d="M${cx-46} ${cy+12} Q${cx} ${cy-26} ${cx+46} ${cy+12}" stroke="${p.tone}" stroke-width="7" fill="none"/>`;
+  }
+
+  function partsPanel() {
+    let s = `<rect class="panel" x="54" y="34" width="1372" height="400" rx="12"/>`;
+    s += `<text class="ptitle" x="740" y="84">Find these pieces</text>`;
+    const cols = 5, cw = 262, x0 = 190, rows = [206, 338];
+    PARTS.forEach((p, i) => {
+      const cx = x0 + (i % cols) * cw, cy = rows[Math.floor(i / cols)];
+      s += partIcon(p, cx, cy);
+      s += `<text class="pcount" x="${cx}" y="${cy + 62}">×${p.n}</text>`;
+      s += `<text class="plabel" x="${cx}" y="${cy + 82}">${esc(p.label)}</text>`;
+    });
+    return s;
+  }
+
   function draw(st) {
+    if (st.k === 'parts') {
+      return { svg: partsPanel(), at: null, r: 0 };
+    }
+    if (st.k === 'zone') {
+      const x1 = X(st.p0) - 13, x2 = X(st.p1) + 13;
+      const y1 = Y(st.r0) - 13, y2 = Y(st.r1) + 13;
+      return { svg: `<rect class="zone" x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" rx="12"/>`,
+               at: null, r: 0 };
+    }
     if (st.k === 'w') {
       const a = pt(st.a), b = pt(st.b);
       const mid = (a.x === b.x) ? [] : [{ x: a.x, y: Math.min(a.y, b.y) - 16 }, { x: b.x, y: Math.min(a.y, b.y) - 16 }];
@@ -414,6 +484,21 @@
   // ---------- the builds ----------
   const BUILDS = [
     {
+      id: 'prep', tab: 'Get ready', cum: false,
+      why: 'Ten minutes on your own before he sits down. An empty, broken-in board and a pile of the right parts is the difference between a build that flows and one that stalls on a stiff hole.',
+      steps: [
+        { k:'zone', p0:18, p1:63, r0:'J', r1:'Pbn',
+          say:'Take everything else off the board.',
+          check:'<b>Leave only the extension board.</b> Leftover parts invite him to poke at things that are not part of the lesson.' },
+        { k:'zone', p0:26, p1:51, r0:'C', r1:'Pbn',
+          say:'Push a wire in and out of every hole here.',
+          check:'<b>Break the board in yourself.</b> A fresh breadboard is stiff, and small hands pushing an LED leg into an unyielding hole is the fastest way for him to decide he is bad at this.' },
+        { k:'parts',
+          say:'Find these pieces.',
+          check:'<b>All five builds use only this.</b> Builds 0–3 need no laptop at all — the board just needs USB power, so a phone charger is enough.' }
+      ]
+    },
+    {
       id: 'rows', tab: '0 · Secret rows', cum: false,
       why: 'No parts. The point is that a breadboard has connections you cannot see — until that lands, every later step is just copying pictures. Do the wire-moving discovery first, then use these three reveals to confirm what he found.',
       steps: [
@@ -470,7 +555,7 @@
     }
   ];
 
-  const HOT = { light:[26,29], two:[26,29], knob:[26,29], code:[26,27,29], rows:[] };
+  const HOT = { prep:[], light:[26,29], two:[26,29], knob:[26,29], code:[26,27,29], rows:[] };
 
   const $ = id => document.getElementById(id);
   let bi = 0, si = 0;
