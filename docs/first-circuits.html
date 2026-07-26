@@ -1,0 +1,488 @@
+<title>Bodhi's First Circuits — step by step</title>
+
+<style>
+  :root {
+    --bg: #F2F4F1; --surface: #FFFFFF; --surface-2: #E7EBE5;
+    --ink: #14201B; --ink-2: #55635C; --ink-3: #7C8A82;
+    --rule: #D3D9D0; --rule-strong: #B6BFB6;
+    --brass: #8A6D14; --copper: #A2451A;
+    --bb-body: #E4E6DF; --bb-edge: #C3C7BC; --bb-hole: #9AA096;
+    --bb-channel: #D2D5CB; --bb-text: #6E7A70;
+    --w-5v: #C93A31; --w-3v3: #C2610C; --w-gnd: #33403A;
+    --w-s1: #B8890A; --w-sig: #7A4FBF;
+    --glow: #E0A32E;
+    --font-display: "Avenir Next Condensed", "HelveticaNeue-CondensedBold", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
+    --font-body: "Charter", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --measure: 66ch;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0B1310; --surface: #121C18; --surface-2: #1A2620;
+      --ink: #E4EDE7; --ink-2: #9DABA3; --ink-3: #77857D;
+      --rule: #253229; --rule-strong: #35463B;
+      --brass: #D9B356; --copper: #E0813F;
+      --bb-body: #2A322C; --bb-edge: #3A443C; --bb-hole: #59645C;
+      --bb-channel: #222A25; --bb-text: #8B978F;
+      --w-5v: #E85F54; --w-3v3: #E0813F; --w-gnd: #A9B7AF;
+      --w-s1: #E3B93C; --w-sig: #A87FE0; --glow: #F0C255;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0B1310; --surface: #121C18; --surface-2: #1A2620;
+    --ink: #E4EDE7; --ink-2: #9DABA3; --ink-3: #77857D;
+    --rule: #253229; --rule-strong: #35463B;
+    --brass: #D9B356; --copper: #E0813F;
+    --bb-body: #2A322C; --bb-edge: #3A443C; --bb-hole: #59645C;
+    --bb-channel: #222A25; --bb-text: #8B978F;
+    --w-5v: #E85F54; --w-3v3: #E0813F; --w-gnd: #A9B7AF;
+    --w-s1: #E3B93C; --w-sig: #A87FE0; --glow: #F0C255;
+  }
+  :root[data-theme="light"] {
+    --bg: #F2F4F1; --surface: #FFFFFF; --surface-2: #E7EBE5;
+    --ink: #14201B; --ink-2: #55635C; --ink-3: #7C8A82;
+    --rule: #D3D9D0; --rule-strong: #B6BFB6;
+    --brass: #8A6D14; --copper: #A2451A;
+    --bb-body: #E4E6DF; --bb-edge: #C3C7BC; --bb-hole: #9AA096;
+    --bb-channel: #D2D5CB; --bb-text: #6E7A70;
+    --w-5v: #C93A31; --w-3v3: #C2610C; --w-gnd: #33403A;
+    --w-s1: #B8890A; --w-sig: #7A4FBF; --glow: #E0A32E;
+  }
+
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 900px; margin: 0 auto; padding: 0 20px 80px; }
+
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; text-wrap: balance; }
+  h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); line-height: 1.04; }
+  h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); }
+  p { margin: 0; max-width: var(--measure); }
+  code { font-family: var(--font-mono); font-size: 0.85em; background: var(--surface-2); padding: 0.1em 0.36em; border-radius: 3px; }
+
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--brass);
+  }
+
+  header.masthead {
+    padding: 52px 0 28px; border-bottom: 2px solid var(--ink);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .masthead .lede { font-size: 1.12rem; color: var(--ink-2); max-width: 54ch; }
+
+  section { padding: 34px 0; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 18px; }
+  section:last-of-type { border-bottom: none; }
+
+  /* ---- build picker ---- */
+  .builds { display: flex; flex-wrap: wrap; gap: 8px; }
+  .builds button {
+    font-family: var(--font-mono); font-size: 0.76rem;
+    padding: 10px 14px; border-radius: 3px; cursor: pointer;
+    background: var(--surface); color: var(--ink-2); border: 1px solid var(--rule-strong);
+  }
+  .builds button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .builds button:focus-visible, .nav button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+  /* ---- the step viewer ---- */
+  .viewer { display: flex; flex-direction: column; gap: 14px; }
+  .stepbar { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .stepnum { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; }
+  .dots { display: flex; gap: 6px; }
+  .dots i {
+    width: 11px; height: 11px; border-radius: 50%;
+    background: var(--rule-strong); display: block;
+  }
+  .dots i.done { background: var(--ink-3); }
+  .dots i.now { background: var(--glow); box-shadow: 0 0 0 3px color-mix(in srgb, var(--glow) 28%, transparent); }
+
+  .stage {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 6px; padding: 10px;
+  }
+  .stage svg { display: block; width: 100%; height: auto; }
+
+  .say {
+    font-size: clamp(1.15rem, 2.6vw, 1.45rem);
+    line-height: 1.35; text-wrap: balance;
+    min-height: 2.2em; max-width: 40ch;
+  }
+  .check {
+    border-left: 3px solid var(--glow);
+    padding: 8px 0 8px 16px;
+    font-size: 0.98rem; color: var(--ink-2); max-width: 52ch;
+  }
+  .check b { color: var(--ink); }
+
+  .nav { display: flex; gap: 10px; }
+  .nav button {
+    flex: 1; min-height: 62px;
+    font-family: var(--font-display); font-size: 1.25rem; font-weight: 600;
+    border-radius: 6px; cursor: pointer;
+    background: var(--ink); color: var(--bg); border: 1px solid var(--ink);
+  }
+  .nav button.ghost { background: transparent; color: var(--ink-2); border-color: var(--rule-strong); flex: 0 0 32%; }
+  .nav button:disabled { opacity: 0.32; cursor: default; }
+
+  details.grown {
+    border-top: 1px solid var(--rule); padding-top: 14px;
+  }
+  details.grown summary {
+    cursor: pointer; font-family: var(--font-mono);
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brass);
+  }
+  details.grown p { margin-top: 10px; color: var(--ink-2); }
+
+  /* ---- svg primitives ---- */
+  .bb-body { fill: var(--bb-body); stroke: var(--bb-edge); stroke-width: 1.5; }
+  .bb-channel { fill: var(--bb-channel); }
+  .bb-hole { fill: var(--bb-hole); opacity: 0.5; }
+  .bb-lbl { font-family: var(--font-mono); font-size: 11px; fill: var(--bb-text); }
+  .rail-pos { stroke: var(--w-5v); stroke-width: 2; opacity: 0.7; }
+  .rail-neg { stroke: var(--w-gnd); stroke-width: 2; opacity: 0.5; }
+
+  .wire-out { fill: none; stroke: rgba(0,0,0,0.4); stroke-linecap: round; stroke-linejoin: round; }
+  .wire-in { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .lead { stroke: var(--ink-3); stroke-width: 2; fill: none; }
+  .rbody { fill: var(--surface); stroke: var(--ink); stroke-width: 1.6; }
+  .part { fill: var(--surface); stroke: var(--ink); stroke-width: 1.6; }
+  .tval { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); font-weight: 600; text-anchor: middle; }
+  .tpin { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-2); text-anchor: middle; }
+  .extlbl { font-family: var(--font-mono); font-size: 9px; fill: var(--ink-3); }
+  .extlbl.on { fill: var(--brass); font-weight: 700; }
+
+  .done { opacity: 0.3; }
+  .halo { fill: none; stroke: var(--glow); stroke-width: 3; stroke-dasharray: 7 5; }
+  .tintfill { fill: var(--glow); opacity: 0.16; }
+  .tintline { fill: none; stroke: var(--glow); stroke-width: 2.5; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .halo { animation: spin 9s linear infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes spin { to { stroke-dashoffset: -48; } }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">One piece at a time</div>
+    <h1>Bodhi's first circuits</h1>
+    <p class="lede">Five short builds, each one finishing with something that lights up, dims or blinks. He places every piece.</p>
+  </header>
+
+  <section>
+    <div class="builds" id="builds"></div>
+
+    <div class="viewer">
+      <div class="stepbar">
+        <span class="stepnum" id="stepnum">Step 1</span>
+        <span class="dots" id="dots"></span>
+      </div>
+
+      <div class="stage">
+        <svg id="stage" viewBox="0 0 1480 470" role="img" aria-label="Breadboard build step"></svg>
+      </div>
+
+      <p class="say" id="say"></p>
+      <div class="check" id="check" hidden></div>
+
+      <div class="nav">
+        <button type="button" class="ghost" id="prev">Back</button>
+        <button type="button" id="next">Next piece</button>
+      </div>
+    </div>
+
+    <details class="grown">
+      <summary>Grown-up note</summary>
+      <p id="why"></p>
+    </details>
+  </section>
+
+  <section>
+    <div class="eyebrow">Before the first build</div>
+    <h2>Let him find the hidden rows himself</h2>
+    <p>The hardest idea here isn't electricity — it's that a breadboard has connections you can't see. LEGO's connections are visible and tactile; these are hidden, and nothing else makes sense until it clicks.</p>
+    <p>Wire one light so it's on, then let him move one leg around the board and watch when it stays lit and when it dies. He'll find the rows on his own. Build&nbsp;0 above just confirms what he discovered.</p>
+    <p>Two things worth knowing: a fresh breadboard is <b>stiff</b> — break it in yourself first, or he'll decide he's bad at this. And when a light doesn't work because it's in backwards, <b>let him find it</b>. That's the best teaching moment in the whole kit.</p>
+    <p>Fuller notes in <code>docs/teaching-plan.md</code>.</p>
+  </section>
+
+  <footer style="padding-top:24px;font-family:var(--font-mono);font-size:0.72rem;color:var(--ink-3);line-height:1.8">
+    Builds 1–3 need no code at all — just USB power.<br>
+    Build 4 needs <code>FirstLight</code>: <code>./flash.sh FirstLight</code>
+  </footer>
+</div>
+
+<script>
+(function () {
+  // The whole breadboard, end to end. Showing only the working area meant the
+  // extension board ran off the edge, which made it read as a floating label
+  // box rather than a real part sitting in real holes.
+  const PITCH = 22, PAD = 46, SPAN0 = 1, SPAN1 = 63;
+  const ROW = { Pt:26, Ptn:48, J:96, I:118, H:140, G:162, F:184,
+                E:250, D:272, C:294, B:316, A:338, Pb:386, Pbn:408 };
+  const TOP = ['J','I','H','G','F'], BOT = ['E','D','C','B','A'];
+  const RAILS = ['Pt','Ptn','Pb','Pbn'];
+  const BOARD_T = 12, BOARD_B = 424, CH_T = 190, CH_B = 244;
+  const EXT_FROM = 13, EXT_TO = 32;
+
+  const X = p => PAD + (p - SPAN0) * PITCH;
+  const Y = r => ROW[r];
+  const pt = ([r, p]) => ({ x: X(p), y: Y(r) });
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const COLOR = { v5:'var(--w-5v)', gnd:'var(--w-gnd)', v3:'var(--w-3v3)', s1:'var(--w-s1)', sig:'var(--w-sig)' };
+
+  // ---------- drawing ----------
+  function board() {
+    const w = X(SPAN1) - X(SPAN0) + PAD * 1.4;
+    let s = `<rect class="bb-body" x="10" y="${BOARD_T}" width="${w + 24}" height="${BOARD_B - BOARD_T}" rx="7"/>`;
+    s += `<rect class="bb-channel" x="10" y="${CH_T}" width="${w + 24}" height="${CH_B - CH_T}"/>`;
+    s += `<line class="rail-pos" x1="18" y1="${Y('Pt') - 12}" x2="${w + 28}" y2="${Y('Pt') - 12}"/>`;
+    s += `<line class="rail-neg" x1="18" y1="${Y('Ptn') + 12}" x2="${w + 28}" y2="${Y('Ptn') + 12}"/>`;
+    s += `<line class="rail-pos" x1="18" y1="${Y('Pb') - 12}" x2="${w + 28}" y2="${Y('Pb') - 12}"/>`;
+    s += `<line class="rail-neg" x1="18" y1="${Y('Pbn') + 12}" x2="${w + 28}" y2="${Y('Pbn') + 12}"/>`;
+    for (let p = SPAN0; p <= SPAN1; p++) {
+      TOP.concat(BOT).forEach(r => { s += `<circle class="bb-hole" cx="${X(p)}" cy="${Y(r)}" r="4"/>`; });
+      if (p % 6 !== 0) RAILS.forEach(r => { s += `<circle class="bb-hole" cx="${X(p)}" cy="${Y(r)}" r="4"/>`; });
+      if (p % 5 === 0) {
+        s += `<text class="bb-lbl" x="${X(p)}" y="${Y('J') - 12}" text-anchor="middle">${p}</text>`;
+        s += `<text class="bb-lbl" x="${X(p)}" y="${Y('A') + 18}" text-anchor="middle">${p}</text>`;
+      }
+    }
+    TOP.concat(BOT).forEach(r => {
+      s += `<text class="bb-lbl" x="22" y="${Y(r) + 4}">${r.toLowerCase()}</text>`;
+    });
+    return s;
+  }
+
+  // The extension board occupies positions 13-32, pins in columns d and g, so
+  // its body physically covers d through g. Transcribed from the board itself —
+  // see docs/extension-board.md.
+  const D_LAB = { 13:'3.3V', 14:'EN', 15:'36', 16:'39', 17:'34', 18:'35', 19:'32', 20:'33',
+                  21:'25', 22:'26', 23:'27', 24:'14', 25:'12', 26:'GND', 27:'13',
+                  28:'3.3V', 29:'3.3V', 30:'3.3V', 31:'5V', 32:'5V' };
+  const G_LAB = { 13:'GND', 14:'23', 15:'22', 16:'TX', 17:'RX', 18:'21', 19:'GND', 20:'19',
+                  21:'18', 22:'5', 23:'GND', 24:'4', 25:'0', 26:'2', 27:'15',
+                  28:'GND', 29:'GND', 30:'GND', 31:'GND', 32:'GND' };
+
+  function extBoard(hot) {
+    const x0 = X(EXT_FROM) - 11, w = X(EXT_TO) - X(EXT_FROM) + 22;
+    let s = `<rect class="part" x="${x0}" y="154" width="${w}" height="126" rx="3"/>`;
+    for (let p = EXT_FROM; p <= EXT_TO; p++) {
+      const on = hot.has(p);
+      s += `<text class="extlbl${on ? ' on' : ''}" transform="translate(${X(p) + 4} 216) rotate(-90)">${esc(G_LAB[p])}</text>`;
+      s += `<text class="extlbl${on ? ' on' : ''}" transform="translate(${X(p) + 4} 278) rotate(-90)">${esc(D_LAB[p])}</text>`;
+    }
+    // Sits in the clear band between the two label rows so it can't collide.
+    s += `<text class="tpin" x="${x0 + w / 2}" y="240" text-anchor="middle">the little computer</text>`;
+    return s;
+  }
+
+  function rawWire(points, color) {
+    const d = points.map((q, i) => (i ? 'L' : 'M') + q.x.toFixed(1) + ' ' + q.y.toFixed(1)).join(' ');
+    return `<path class="wire-out" d="${d}" stroke-width="8"/><path class="wire-in" d="${d}" stroke="${color}" stroke-width="5.4"/>`;
+  }
+
+  function draw(st) {
+    if (st.k === 'w') {
+      const a = pt(st.a), b = pt(st.b);
+      const mid = (a.x === b.x) ? [] : [{ x: a.x, y: Math.min(a.y, b.y) - 16 }, { x: b.x, y: Math.min(a.y, b.y) - 16 }];
+      return { svg: rawWire([a, ...mid, b], COLOR[st.c]), at: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, r: Math.max(30, Math.abs(a.x - b.x) / 2 + 14) };
+    }
+    if (st.k === 'r') {
+      const a = pt(st.a), b = pt(st.b);
+      const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
+      const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+      const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+      const bw = Math.max(24, Math.min(44, len - 16));
+      const perp = { x: -dy / len, y: dx / len };
+      return {
+        svg: `<line class="lead" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>` +
+          `<g transform="translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})">` +
+          `<rect class="rbody" x="${(-bw/2).toFixed(1)}" y="-7" width="${bw.toFixed(1)}" height="14" rx="3"/></g>` +
+          `<text class="tval" x="${(mx + perp.x * 18).toFixed(1)}" y="${(my + perp.y * 18 + 4).toFixed(1)}">${esc(st.v)}</text>`,
+        at: { x: mx, y: my }, r: Math.max(30, len / 2 + 12)
+      };
+    }
+    if (st.k === 'led') {
+      const a = pt([st.row, st.a]), b = pt([st.row, st.b]);
+      const cx = (a.x + b.x) / 2, cy = a.y - 17;
+      return {
+        svg: `<line class="lead" x1="${a.x}" y1="${a.y}" x2="${cx}" y2="${cy}"/>` +
+          `<line class="lead" x1="${b.x}" y1="${b.y}" x2="${cx}" y2="${cy}"/>` +
+          `<circle cx="${cx}" cy="${cy}" r="11" fill="${st.tone}" stroke="var(--ink)" stroke-width="1.6"/>` +
+          `<text class="tpin" x="${a.x - 13}" y="${a.y + 5}">+</text>`,
+        at: { x: cx, y: cy + 6 }, r: 34
+      };
+    }
+    if (st.k === 'pot') {
+      const a = pt([st.row, st.p]), c = pt([st.row, st.p + 2]);
+      const cx = (a.x + c.x) / 2, top = a.y - 46;
+      let s = '';
+      for (let i = 0; i < 3; i++) {
+        const lx = X(st.p + i);
+        s += `<line class="lead" x1="${lx}" y1="${a.y}" x2="${lx}" y2="${top + 26}"/>`;
+      }
+      s += `<rect class="part" x="${a.x - 13}" y="${top}" width="${c.x - a.x + 26}" height="28" rx="4"/>`;
+      s += `<circle cx="${cx}" cy="${top + 14}" r="10" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.6"/>`;
+      s += `<line class="lead" x1="${cx}" y1="${top + 14}" x2="${cx + 7}" y2="${top + 7}"/>`;
+      return { svg: s, at: { x: cx, y: top + 14 }, r: 40 };
+    }
+    if (st.k === 'reveal') {
+      let s = '';
+      if (st.what === 'cols') {
+        for (let p = SPAN0; p <= SPAN1; p++) {
+          s += `<rect class="tintfill" x="${X(p) - 9}" y="${Y('J') - 9}" width="18" height="${Y('F') - Y('J') + 18}" rx="9"/>`;
+          s += `<rect class="tintfill" x="${X(p) - 9}" y="${Y('E') - 9}" width="18" height="${Y('A') - Y('E') + 18}" rx="9"/>`;
+        }
+      } else if (st.what === 'channel') {
+        s += `<rect class="tintfill" x="10" y="${CH_T}" width="${X(SPAN1) - 10 + 30}" height="${CH_B - CH_T}"/>`;
+        s += `<line class="tintline" x1="10" y1="${(CH_T + CH_B) / 2}" x2="${X(SPAN1) + 30}" y2="${(CH_T + CH_B) / 2}"/>`;
+      } else {
+        RAILS.forEach(r => {
+          s += `<rect class="tintfill" x="14" y="${Y(r) - 9}" width="${X(SPAN1) - 14 + 30}" height="18" rx="9"/>`;
+        });
+      }
+      return { svg: s, at: null, r: 0 };
+    }
+    return { svg: '', at: null, r: 0 };
+  }
+
+  // ---------- the builds ----------
+  const BUILDS = [
+    {
+      id: 'rows', tab: '0 · Secret rows', cum: false,
+      why: 'No parts. The point is that a breadboard has connections you cannot see — until that lands, every later step is just copying pictures. Do the wire-moving discovery first, then use these three reveals to confirm what he found.',
+      steps: [
+        { k:'reveal', what:'cols', say:'Every five holes going down are joined together inside.' },
+        { k:'reveal', what:'channel', say:'The ditch down the middle splits them. Top five, bottom five.' },
+        { k:'reveal', what:'rails', say:'These long lines run the whole way across. They carry the power.',
+          check:'<b>Try it:</b> with a light already on, move one leg around. Same group — still on. Different group — dark.' }
+      ]
+    },
+    {
+      id: 'light', tab: '1 · Make a light', cum: true,
+      why: 'Five placements and it works, with no laptop involved. Resist helping — if the LED is backwards, let him discover that turning it around fixes it.',
+      steps: [
+        { k:'w', a:['A',29], b:['Pb',29], c:'v5', say:'Red wire. The power comes out here.' },
+        { k:'w', a:['A',26], b:['Pbn',26], c:'gnd', say:'Black wire. This is the way back.' },
+        { k:'r', a:['Pb',38], b:['B',38], v:'220Ω', say:'A resistor, so the light does not get too much.' },
+        { k:'led', row:'C', a:38, b:39, tone:'#D94F3D', say:'The light! Long leg on the left.' },
+        { k:'w', a:['B',39], b:['Pbn',39], c:'gnd', say:'Last wire. This closes the loop.',
+          check:'<b>It should be lit.</b> If not, turn the light around — the legs are the wrong way.' }
+      ]
+    },
+    {
+      id: 'two', tab: '2 · Two lights', cum: true,
+      why: 'Deliberately the same three pieces again. Say it out loud: "you built the same thing twice." That repetition is the first real structural idea.',
+      steps: [
+        { k:'r', a:['Pb',42], b:['B',42], v:'220Ω', say:'Another resistor, just like before.' },
+        { k:'led', row:'C', a:42, b:43, tone:'#E0A32E', say:'A yellow light this time.' },
+        { k:'w', a:['B',43], b:['Pbn',43], c:'gnd', say:'And back to the black line.',
+          check:'<b>Two lights.</b> Ask him what he did differently. Nothing — he built the same thing twice.' }
+      ]
+    },
+    {
+      id: 'knob', tab: '3 · A knob', cum: true,
+      why: 'First idea beyond on/off. The knob is in the path of only the third light, so the contrast with the other two is doing the teaching.',
+      steps: [
+        { k:'pot', row:'C', p:46, say:'A knob. Its three legs go in a row.' },
+        { k:'w', a:['B',46], b:['Pb',46], c:'v5', say:'Power into one side of the knob.' },
+        { k:'r', a:['B',47], b:['B',50], v:'220Ω', say:'Out of the middle leg, through a resistor.' },
+        { k:'led', row:'C', a:50, b:51, tone:'#3E9E5A', say:'A green light.' },
+        { k:'w', a:['B',51], b:['Pbn',51], c:'gnd', say:'Back to the black line again.',
+          check:'<b>Turn the knob.</b> This one gets brighter and dimmer — the other two do not care.' }
+      ]
+    },
+    {
+      id: 'code', tab: '4 · The computer', cum: true,
+      why: 'The hinge. This light is wired to a pin the ESP32 controls, so it stays dark no matter how carefully he builds it — until code arrives. That is the moment programming becomes worth caring about.',
+      steps: [
+        { k:'w', a:['A',27], b:['A',34], c:'s1', say:'This one does not go to the power line. It goes to the computer.' },
+        { k:'r', a:['B',34], b:['B',36], v:'220Ω', say:'A resistor, same as always.' },
+        { k:'led', row:'C', a:36, b:37, tone:'#3F7FD0', say:'A blue light.' },
+        { k:'w', a:['B',37], b:['Pbn',37], c:'gnd', say:'And back to the black line.',
+          check:'<b>Nothing happens — and that is right.</b> This light is waiting for instructions. Upload <code>FirstLight</code> and it will blink.' }
+      ]
+    }
+  ];
+
+  const HOT = { light:[26,29], two:[26,29], knob:[26,29], code:[26,27,29], rows:[] };
+
+  const $ = id => document.getElementById(id);
+  let bi = 0, si = 0;
+
+  const priorSteps = i => BUILDS.slice(0, i).filter(b => b.cum && BUILDS[i].cum).flatMap(b => b.steps);
+
+  function render() {
+    const b = BUILDS[bi];
+    const prior = priorSteps(bi);
+    const hot = new Set(HOT[b.id] || []);
+
+    let svg = board() + extBoard(hot);
+    let doneSvg = '', nowSvg = '', halo = '';
+
+    prior.forEach(st => { doneSvg += draw(st).svg; });
+    b.steps.forEach((st, i) => {
+      if (i > si) return;
+      const d = draw(st);
+      if (i < si) doneSvg += d.svg;
+      else {
+        nowSvg = d.svg;
+        if (d.at) halo = `<circle class="halo" cx="${d.at.x.toFixed(1)}" cy="${d.at.y.toFixed(1)}" r="${d.r}"/>`;
+      }
+    });
+
+    $('stage').innerHTML = svg + `<g class="done">${doneSvg}</g>` + nowSvg + halo;
+
+    const st = b.steps[si];
+    $('stepnum').textContent = b.cum ? `Step ${si + 1} of ${b.steps.length}` : `Look ${si + 1} of ${b.steps.length}`;
+    $('say').textContent = st.say;
+    if (st.check) { $('check').innerHTML = st.check; $('check').hidden = false; }
+    else $('check').hidden = true;
+    $('why').textContent = b.why;
+
+    $('dots').innerHTML = b.steps.map((_, i) =>
+      `<i class="${i < si ? 'done' : i === si ? 'now' : ''}"></i>`).join('');
+
+    $('prev').disabled = (si === 0 && bi === 0);
+    $('next').textContent = (si === b.steps.length - 1)
+      ? (bi === BUILDS.length - 1 ? 'All done' : 'Next build →')
+      : (b.cum ? 'Next piece' : 'Next');
+    $('next').disabled = (bi === BUILDS.length - 1 && si === b.steps.length - 1);
+
+    [...$('builds').children].forEach((el, j) => el.setAttribute('aria-pressed', String(j === bi)));
+  }
+
+  function step(d) {
+    const b = BUILDS[bi];
+    if (d > 0) {
+      if (si < b.steps.length - 1) si++;
+      else if (bi < BUILDS.length - 1) { bi++; si = 0; }
+    } else {
+      if (si > 0) si--;
+      else if (bi > 0) { bi--; si = BUILDS[bi].steps.length - 1; }
+    }
+    render();
+  }
+
+  BUILDS.forEach((b, i) => {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.textContent = b.tab;
+    el.setAttribute('aria-pressed', 'false');
+    el.addEventListener('click', () => { bi = i; si = 0; render(); });
+    $('builds').appendChild(el);
+  });
+  $('next').addEventListener('click', () => step(1));
+  $('prev').addEventListener('click', () => step(-1));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') step(1);
+    if (e.key === 'ArrowLeft') step(-1);
+  });
+
+  render();
+})();
+</script>
