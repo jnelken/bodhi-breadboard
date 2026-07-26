@@ -116,8 +116,25 @@
 
   .say {
     font-size: clamp(1.15rem, 2.6vw, 1.45rem);
-    line-height: 1.35; text-wrap: balance;
+    line-height: 1.35;
     min-height: 2.7em; max-width: 40ch;   /* two full lines, not 1.6 */
+    /* No text-wrap: balance here — it re-balances on every keystroke while the
+       line is being typed, which makes words jump between lines. */
+  }
+
+  /* Pac-Man cursor. Two frames only, and he chomps once per letter, so the
+     mouth is driven by the typing itself rather than by a separate timer. */
+  .pac {
+    display: inline-block;
+    width: 0.8em; height: 0.8em;
+    margin-left: 0.3em;
+    vertical-align: -0.04em;
+    border-radius: 50%;
+    background: var(--glow);
+    clip-path: polygon(100% 74%, 50% 50%, 100% 26%, 100% 0, 0 0, 0 100%, 100% 100%);
+  }
+  .pac.chomp {
+    clip-path: polygon(100% 53%, 50% 50%, 100% 47%, 100% 0, 0 0, 0 100%, 100% 100%);
   }
   .check {
     border-left: 3px solid var(--glow);
@@ -209,7 +226,7 @@
       </div>
 
       <div class="readout">
-        <p class="say" id="say"></p>
+        <p class="say" id="say"><span id="sayText"></span><span class="pac" id="pac" aria-hidden="true"></span></p>
         <div class="check" id="check" hidden></div>
       </div>
 
@@ -560,6 +577,45 @@
   const $ = id => document.getElementById(id);
   let bi = 0, si = 0;
 
+  // --- Typed instructions, with Pac-Man as the cursor ----------------------
+  // reactbits.dev's TextType is a React component that needs React and gsap.
+  // This page is one self-contained file with no bundler, and the artifact
+  // sandbox blocks external scripts, so neither can load. Same behaviour
+  // written directly — the settings below mirror TextType's prop names.
+  // gsap was only doing the cursor blink there; here Pac-Man's mouth does it,
+  // one chomp per character.
+  const TYPE = {
+    typingSpeed: 46,
+    initialDelay: 120,
+    variableSpeed: { min: 34, max: 62 },   // human-feeling jitter
+    showCursor: true
+  };
+  const reduceMotion = window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let typeTimer = null;
+
+  function typeSay(text) {
+    clearTimeout(typeTimer);
+    const out = $('sayText'), pac = $('pac');
+    pac.hidden = !TYPE.showCursor;
+
+    if (reduceMotion) { out.textContent = text; pac.classList.remove('chomp'); return; }
+
+    out.textContent = '';
+    let i = 0;
+    const speed = () => TYPE.variableSpeed
+      ? TYPE.variableSpeed.min + Math.random() * (TYPE.variableSpeed.max - TYPE.variableSpeed.min)
+      : TYPE.typingSpeed;
+
+    const tick = () => {
+      if (i >= text.length) { pac.classList.remove('chomp'); return; }  // rest with mouth open
+      out.textContent += text[i++];
+      pac.classList.toggle('chomp');
+      typeTimer = setTimeout(tick, speed());
+    };
+    typeTimer = setTimeout(tick, TYPE.initialDelay);
+  }
+
   const priorSteps = i => BUILDS.slice(0, i).filter(b => b.cum && BUILDS[i].cum).flatMap(b => b.steps);
 
   function render() {
@@ -585,7 +641,7 @@
 
     const st = b.steps[si];
     $('stepnum').textContent = b.cum ? `Step ${si + 1} of ${b.steps.length}` : `Look ${si + 1} of ${b.steps.length}`;
-    $('say').textContent = st.say;
+    typeSay(st.say);
     if (st.check) { $('check').innerHTML = st.check; $('check').hidden = false; }
     else $('check').hidden = true;
     $('why').textContent = b.why;
