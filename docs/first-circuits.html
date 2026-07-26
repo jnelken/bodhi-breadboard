@@ -111,6 +111,10 @@
      a three-line .check (~75px) + its 16px padding. */
   .readout {
     min-height: 168px;
+    display: flex; flex-direction: row; align-items: stretch; gap: 24px;
+  }
+  .readout-text {
+    flex: 1 1 auto; min-width: 0;
     display: flex; flex-direction: column; gap: 14px;
   }
 
@@ -122,20 +126,30 @@
        line is being typed, which makes words jump between lines. */
   }
 
-  /* Pac-Man cursor. Two frames only, and he chomps once per letter, so the
-     mouth is driven by the typing itself rather than by a separate timer. */
+  /* Pac-Man sits at the right of the instruction block, as tall as it is,
+     facing left so he is eating toward the words. Two frames only — the mouth
+     swaps clip-path with no transition between them. */
   .pac {
-    display: inline-block;
-    width: 0.8em; height: 0.8em;
-    margin-left: 0.3em;
-    vertical-align: -0.04em;
+    flex: 0 0 auto;
+    align-self: stretch;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     background: var(--glow);
-    clip-path: polygon(100% 74%, 50% 50%, 100% 26%, 100% 0, 0 0, 0 100%, 100% 100%);
+    clip-path: polygon(0 74%, 50% 50%, 0 26%, 0 0, 100% 0, 100% 100%, 0 100%);
   }
   .pac.chomp {
-    clip-path: polygon(100% 53%, 50% 50%, 100% 47%, 100% 0, 0 0, 0 100%, 100% 100%);
+    clip-path: polygon(0 53%, 50% 50%, 0 47%, 0 0, 100% 0, 100% 100%, 0 100%);
   }
+  /* On a narrow screen the words matter more than the mascot. */
+  @media (max-width: 620px) { .pac { display: none; } }
+
+  .bar-right { display: flex; align-items: center; gap: 14px; }
+  .mute {
+    background: none; border: 1px solid var(--rule-strong); border-radius: 6px;
+    cursor: pointer; font-size: 1rem; line-height: 1;
+    padding: 7px 10px; color: var(--ink-2);
+  }
+  .mute:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
   .check {
     border-left: 3px solid var(--glow);
     padding: 8px 0 8px 16px;
@@ -218,7 +232,10 @@
     <div class="viewer">
       <div class="stepbar">
         <span class="stepnum" id="stepnum">Step 1</span>
-        <span class="dots" id="dots"></span>
+        <span class="bar-right">
+          <span class="dots" id="dots"></span>
+          <button type="button" class="mute" id="mute" aria-pressed="false" title="Typing sound on or off">🔊</button>
+        </span>
       </div>
 
       <div class="stage">
@@ -226,8 +243,11 @@
       </div>
 
       <div class="readout">
-        <p class="say" id="say"><span id="sayText"></span><span class="pac" id="pac" aria-hidden="true"></span></p>
-        <div class="check" id="check" hidden></div>
+        <div class="readout-text">
+          <p class="say" id="say"><span id="sayText"></span></p>
+          <div class="check" id="check" hidden></div>
+        </div>
+        <div class="pac" id="pac" aria-hidden="true"></div>
       </div>
 
       <div class="nav">
@@ -585,32 +605,73 @@
   // gsap was only doing the cursor blink there; here Pac-Man's mouth does it,
   // one chomp per character.
   const TYPE = {
-    typingSpeed: 46,
-    initialDelay: 120,
-    variableSpeed: { min: 34, max: 62 },   // human-feeling jitter
-    showCursor: true
+    typingSpeed: 48,
+    initialDelay: 140,
+    variableSpeed: { min: 36, max: 66 },   // human-feeling jitter
+    chompEveryMs: 250                      // see note below
   };
   const reduceMotion = window.matchMedia
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let typeTimer = null;
+  let typeTimer = null, chompTimer = null, muted = false;
+
+  // --- the tap ---
+  // Synthesised rather than loaded: the sandbox blocks external files, and a
+  // short click costs nothing to generate. Browsers refuse to start audio
+  // before a user gesture, so the very first step types silently and every
+  // step after it taps.
+  let actx = null;
+  function unlockAudio() {
+    if (!actx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) actx = new AC();
+    }
+    if (actx && actx.state === 'suspended') actx.resume();
+  }
+  function tap() {
+    if (muted || !actx || actx.state !== 'running') return;
+    const t = actx.currentTime;
+    const osc = actx.createOscillator(), gain = actx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1400 + Math.random() * 500, t);  // vary so it reads as taps, not a buzz
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.05, t + 0.003);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.035);
+    osc.connect(gain); gain.connect(actx.destination);
+    osc.start(t); osc.stop(t + 0.045);
+  }
+
+  // The chomp runs on its own slow cadence rather than once per character.
+  // At this size, a letter-by-letter mouth would swap about 20 times a second —
+  // too fast to read as chewing, and a large shape flickering that quickly is
+  // worth avoiding on a page built for a child.
+  function startChomp() {
+    clearInterval(chompTimer);
+    if (reduceMotion) return;
+    chompTimer = setInterval(() => $('pac').classList.toggle('chomp'), TYPE.chompEveryMs);
+  }
+  function stopChomp() {
+    clearInterval(chompTimer);
+    $('pac').classList.remove('chomp');   // rests with his mouth open
+  }
 
   function typeSay(text) {
     clearTimeout(typeTimer);
-    const out = $('sayText'), pac = $('pac');
-    pac.hidden = !TYPE.showCursor;
+    const out = $('sayText');
 
-    if (reduceMotion) { out.textContent = text; pac.classList.remove('chomp'); return; }
+    if (reduceMotion) { out.textContent = text; stopChomp(); return; }
 
     out.textContent = '';
     let i = 0;
+    startChomp();
     const speed = () => TYPE.variableSpeed
       ? TYPE.variableSpeed.min + Math.random() * (TYPE.variableSpeed.max - TYPE.variableSpeed.min)
       : TYPE.typingSpeed;
 
     const tick = () => {
-      if (i >= text.length) { pac.classList.remove('chomp'); return; }  // rest with mouth open
-      out.textContent += text[i++];
-      pac.classList.toggle('chomp');
+      if (i >= text.length) { stopChomp(); return; }
+      const ch = text[i++];
+      out.textContent += ch;
+      if (ch !== ' ') tap();              // spaces stay silent, which gives it rhythm
       typeTimer = setTimeout(tick, speed());
     };
     typeTimer = setTimeout(tick, TYPE.initialDelay);
@@ -680,6 +741,17 @@
   });
   $('next').addEventListener('click', () => step(1));
   $('prev').addEventListener('click', () => step(-1));
+
+  // Audio can only start from a real interaction, so take the first one going.
+  ['pointerdown', 'keydown'].forEach(ev =>
+    document.addEventListener(ev, unlockAudio, { once: true }));
+
+  $('mute').addEventListener('click', () => {
+    muted = !muted;
+    $('mute').textContent = muted ? '🔇' : '🔊';
+    $('mute').setAttribute('aria-pressed', String(muted));
+    if (!muted) unlockAudio();
+  });
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight') step(1);
     if (e.key === 'ArrowLeft') step(-1);
