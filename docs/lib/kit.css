@@ -1,0 +1,309 @@
+/* ============================================================================
+   BBKit — shared stylesheet for the breadboard instruction kit.
+
+   Loaded by every page in docs/. Sections:
+     1. Tokens            colours and fonts, light / dark / forced
+     2. Page furniture    body, headings, masthead, sections, footer
+     3. Breadboard        the board itself
+     4. Parts             resistors, LEDs, wires, panels
+     5. Extension board   the dark PCB sitting on top
+     6. Step viewer       tabs, dots, stage, readout, nav
+     7. Narrator          Pac-Man
+     8. Reference extras  only the grown-up reference docs use these
+   ========================================================================= */
+
+/* ---- 1. Tokens ---------------------------------------------------------- */
+
+:root {
+  --bg: #F2F4F1; --surface: #FFFFFF; --surface-2: #E7EBE5;
+  --ink: #14201B; --ink-2: #55635C; --ink-3: #7C8A82;
+  --rule: #D3D9D0; --rule-strong: #B6BFB6;
+  --brass: #8A6D14; --copper: #A2451A;
+  --bb-body: #E4E6DF; --bb-edge: #C3C7BC; --bb-hole: #9AA096;
+  --bb-channel: #D2D5CB; --bb-text: #6E7A70;
+  --w-5v: #C93A31; --w-3v3: #C2610C; --w-gnd: #33403A;
+  --w-s1: #B8890A; --w-s2: #2C6FC4; --w-s3: #1E8A52; --w-sig: #7A4FBF;
+  --glow: #E0A32E;
+
+  --readout-h: 168px;   /* instruction block height; Pac-Man matches it */
+  --page-max: 900px;    /* reference docs widen this to 1020px */
+  --measure: 66ch;
+
+  --font-display: "Avenir Next Condensed", "HelveticaNeue-CondensedBold", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Charter", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* Three selectors, one palette: the OS preference by default, then both
+   explicit overrides so a theme toggle wins in either direction. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0B1310; --surface: #121C18; --surface-2: #1A2620;
+    --ink: #E4EDE7; --ink-2: #9DABA3; --ink-3: #77857D;
+    --rule: #253229; --rule-strong: #35463B;
+    --brass: #D9B356; --copper: #E0813F;
+    --bb-body: #2A322C; --bb-edge: #3A443C; --bb-hole: #59645C;
+    --bb-channel: #222A25; --bb-text: #8B978F;
+    --w-5v: #E85F54; --w-3v3: #E0813F; --w-gnd: #A9B7AF;
+    --w-s1: #E3B93C; --w-s2: #5C9BEA; --w-s3: #45C07E; --w-sig: #A87FE0;
+    --glow: #F0C255;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1310; --surface: #121C18; --surface-2: #1A2620;
+  --ink: #E4EDE7; --ink-2: #9DABA3; --ink-3: #77857D;
+  --rule: #253229; --rule-strong: #35463B;
+  --brass: #D9B356; --copper: #E0813F;
+  --bb-body: #2A322C; --bb-edge: #3A443C; --bb-hole: #59645C;
+  --bb-channel: #222A25; --bb-text: #8B978F;
+  --w-5v: #E85F54; --w-3v3: #E0813F; --w-gnd: #A9B7AF;
+  --w-s1: #E3B93C; --w-s2: #5C9BEA; --w-s3: #45C07E; --w-sig: #A87FE0;
+  --glow: #F0C255;
+}
+:root[data-theme="light"] {
+  --bg: #F2F4F1; --surface: #FFFFFF; --surface-2: #E7EBE5;
+  --ink: #14201B; --ink-2: #55635C; --ink-3: #7C8A82;
+  --rule: #D3D9D0; --rule-strong: #B6BFB6;
+  --brass: #8A6D14; --copper: #A2451A;
+  --bb-body: #E4E6DF; --bb-edge: #C3C7BC; --bb-hole: #9AA096;
+  --bb-channel: #D2D5CB; --bb-text: #6E7A70;
+  --w-5v: #C93A31; --w-3v3: #C2610C; --w-gnd: #33403A;
+  --w-s1: #B8890A; --w-s2: #2C6FC4; --w-s3: #1E8A52; --w-sig: #7A4FBF;
+  --glow: #E0A32E;
+}
+
+/* ---- 2. Page furniture -------------------------------------------------- */
+
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.page { max-width: var(--page-max); margin: 0 auto; padding: 0 20px 80px; }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); line-height: 1.04; }
+h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); line-height: 1.12; }
+h3 { font-size: 1.1rem; }
+p { margin: 0; max-width: var(--measure); }
+code { font-family: var(--font-mono); font-size: 0.85em; background: var(--surface-2); padding: 0.1em 0.36em; border-radius: 3px; }
+
+.eyebrow {
+  font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--brass);
+}
+
+header.masthead {
+  padding: 52px 0 28px; border-bottom: 2px solid var(--ink);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.masthead .lede { font-size: 1.12rem; color: var(--ink-2); max-width: 54ch; }
+
+section { padding: 34px 0; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 18px; }
+section:last-of-type { border-bottom: none; }
+
+footer {
+  padding: 24px 0 0; font-family: var(--font-mono);
+  font-size: 0.72rem; color: var(--ink-3); line-height: 1.8;
+}
+
+ul.plain { margin: 0; padding-left: 1.1em; max-width: var(--measure); }
+ul.plain li { margin-bottom: 7px; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ---- 3. Breadboard ------------------------------------------------------ */
+
+.bb-body { fill: var(--bb-body); stroke: var(--bb-edge); stroke-width: 1.5; }
+.bb-channel { fill: var(--bb-channel); }
+.bb-hole { fill: var(--bb-hole); opacity: 0.5; }
+.bb-lbl { font-family: var(--font-mono); font-size: 11px; fill: var(--bb-text); }
+.rail-pos { stroke: var(--w-5v); stroke-width: 2; opacity: 0.7; }
+.rail-neg { stroke: var(--w-gnd); stroke-width: 2; opacity: 0.5; }
+
+/* ---- 4. Parts ----------------------------------------------------------- */
+
+.wire-out { fill: none; stroke: rgba(0,0,0,0.4); stroke-linecap: round; stroke-linejoin: round; }
+.wire-in { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.lead { stroke: var(--ink-3); stroke-width: 2; fill: none; }
+.rbody { fill: var(--surface); stroke: var(--ink); stroke-width: 1.6; }
+.part { fill: var(--surface); stroke: var(--ink); stroke-width: 1.6; }
+.tval { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); font-weight: 600; text-anchor: middle; }
+.tpin { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-2); text-anchor: middle; }
+.tmod { font-family: var(--font-display); font-size: 13px; fill: var(--ink); font-weight: 600; }
+
+/* The parts inventory, drawn like the page a LEGO booklet opens on. */
+.panel { fill: var(--surface); stroke: var(--rule-strong); stroke-width: 1.5; }
+.ptitle { font-family: var(--font-display); font-size: 27px; font-weight: 600; fill: var(--ink); text-anchor: middle; }
+.pcount { font-family: var(--font-mono); font-size: 23px; font-weight: 700; fill: var(--ink); text-anchor: middle; }
+.plabel { font-family: var(--font-mono); font-size: 13px; fill: var(--ink-2); text-anchor: middle; }
+
+/* Emphasis layers. .done dims everything already built so the new piece is the
+   only thing competing for attention — the whole LEGO trick in one rule. */
+.done { opacity: 0.3; }
+.halo { fill: none; stroke: var(--glow); stroke-width: 3; stroke-dasharray: 7 5; }
+.zone { fill: none; stroke: var(--glow); stroke-width: 3; stroke-dasharray: 11 8; }
+.tintfill { fill: var(--glow); opacity: 0.16; }
+.tintline { fill: none; stroke: var(--glow); stroke-width: 2.5; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .halo { animation: spin 9s linear infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes spin { to { stroke-dashoffset: -48; } }
+}
+
+/* ---- 5. Extension board ------------------------------------------------- */
+
+/* A real dark PCB sitting on top of the breadboard, so it keeps the same
+   colours in both themes — it reads as an object covering those holes, not as
+   a diagram element. */
+.extbody { fill: #1E2723; stroke: #55655B; stroke-width: 1.4; }
+.extpad { fill: #C9A227; }
+.extlbl { font-family: var(--font-mono); font-size: 9px; fill: #A9B8AE; }
+.extlbl.on { fill: #F0C255; font-weight: 700; }
+.exttxt { font-family: var(--font-mono); font-size: 10px; fill: #C3D0C7; text-anchor: middle; }
+.exttight { fill: none; stroke: #E0A32E; stroke-width: 1.5; stroke-dasharray: 3 3; }
+
+/* ---- 6. Step viewer ----------------------------------------------------- */
+
+.builds { display: flex; flex-wrap: wrap; gap: 8px; }
+.builds button {
+  font-family: var(--font-mono); font-size: 0.76rem;
+  padding: 10px 14px; border-radius: 3px; cursor: pointer;
+  background: var(--surface); color: var(--ink-2); border: 1px solid var(--rule-strong);
+}
+.builds button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.builds button:focus-visible, .nav button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+.viewer { display: flex; flex-direction: column; gap: 14px; }
+.stepbar { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.stepnum { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; }
+.bar-right { display: flex; align-items: center; gap: 14px; }
+
+.dots { display: flex; gap: 6px; }
+.dots i { width: 11px; height: 11px; border-radius: 50%; background: var(--rule-strong); display: block; }
+.dots i.done { background: var(--ink-3); }
+.dots i.now { background: var(--glow); box-shadow: 0 0 0 3px color-mix(in srgb, var(--glow) 28%, transparent); }
+
+.stage { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 10px; }
+.stage svg { display: block; width: 100%; height: auto; }
+
+/* The instruction and the "Try it" note both change size between steps, and a
+   five-year-old aiming at a big button does not want it moving under his
+   finger. Reserve the tallest case once, here, so Back/Next never move.
+   Budget: two lines of .say (2.7em at its largest, ~63px) + 14px gap +
+   a three-line .check (~75px) + its 16px padding. */
+.readout {
+  min-height: var(--readout-h);
+  display: flex; flex-direction: row; align-items: stretch; gap: 24px;
+}
+.readout-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+
+.say {
+  font-size: clamp(1.15rem, 2.6vw, 1.45rem);
+  line-height: 1.35;
+  min-height: 2.7em; max-width: 40ch;   /* two full lines, not 1.6 */
+  /* No text-wrap: balance here — it re-balances on every keystroke while the
+     line is being typed, which makes words jump between lines. */
+}
+
+.check {
+  border-left: 3px solid var(--glow);
+  padding: 8px 0 8px 16px;
+  font-size: 0.98rem; color: var(--ink-2); max-width: 52ch;
+}
+.check b { color: var(--ink); }
+
+.mute {
+  background: none; border: 1px solid var(--rule-strong); border-radius: 6px;
+  cursor: pointer; font-size: 1rem; line-height: 1;
+  padding: 7px 10px; color: var(--ink-2);
+}
+.mute:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
+
+.nav { display: flex; gap: 10px; }
+.nav button {
+  flex: 1; min-height: 62px;
+  font-family: var(--font-display); font-size: 1.25rem; font-weight: 600;
+  border-radius: 6px; cursor: pointer;
+  background: var(--ink); color: var(--bg); border: 1px solid var(--ink);
+}
+.nav button.ghost { background: transparent; color: var(--ink-2); border-color: var(--rule-strong); flex: 0 0 32%; }
+.nav button:disabled { opacity: 0.32; cursor: default; }
+
+details.grown { border-top: 1px solid var(--rule); padding-top: 14px; }
+details.grown summary {
+  cursor: pointer; font-family: var(--font-mono);
+  font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brass);
+}
+details.grown p { margin-top: 10px; color: var(--ink-2); }
+
+/* A kid-facing lesson page: the instructions and nothing else. The title is
+   there so the page is identifiable in a tab, not because he will read it. */
+.page.kid { padding-top: 26px; display: flex; flex-direction: column; gap: 18px; }
+.kidtitle {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(1.5rem, 3.4vw, 2rem); color: var(--ink-2);
+  margin: 0; padding-bottom: 14px; border-bottom: 2px solid var(--ink);
+}
+
+/* ---- 7. Narrator -------------------------------------------------------- */
+
+/* Pac-Man sits at the right of the instruction block, as tall as it is, facing
+   left so he is eating toward the words. Two frames only — the mouth swaps
+   clip-path with no transition between them. */
+.pac {
+  /* Explicit width and height, not aspect-ratio + stretch: an empty flex item
+     takes its main size from its content, so aspect-ratio never gets a width
+     to work from and he collapses to zero. Safari is especially unforgiving
+     here, and the iPad is the target. */
+  flex: 0 0 auto;
+  width: var(--readout-h);
+  height: var(--readout-h);
+  align-self: center;
+  border-radius: 50%;
+  background: var(--glow);
+  clip-path: polygon(0 74%, 50% 50%, 0 26%, 0 0, 100% 0, 100% 100%, 0 100%);
+}
+.pac.chomp {
+  clip-path: polygon(0 53%, 50% 50%, 0 47%, 0 0, 100% 0, 100% 100%, 0 100%);
+}
+/* On a narrow screen the words matter more than the mascot. */
+@media (max-width: 620px) { .pac { display: none; } }
+
+/* ---- 8. Reference extras ------------------------------------------------ */
+
+.switch { display: flex; flex-wrap: wrap; gap: 8px; }
+.switch button {
+  font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.04em;
+  padding: 9px 15px; border-radius: 3px; cursor: pointer;
+  background: var(--surface); color: var(--ink-2); border: 1px solid var(--rule-strong);
+}
+.switch button:hover { color: var(--ink); border-color: var(--ink-3); }
+.switch button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.switch button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+.figbox { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 14px; overflow-x: auto; }
+.figbox svg { display: block; min-width: 900px; width: 100%; height: auto; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 18px; height: 3px; border-radius: 2px; flex: none; }
+
+.callout { border-left: 3px solid var(--brass); padding: 4px 0 4px 18px; display: flex; flex-direction: column; gap: 8px; }
+.callout .label {
+  font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--brass);
+}
+
+.maptable { border-collapse: collapse; font-family: var(--font-mono); font-size: 0.78rem; }
+.maptable td { padding: 4px 16px 4px 0; border-bottom: 1px solid var(--rule); }
+.maptable td:first-child { color: var(--ink-2); }
+
+.varnote { display: flex; flex-direction: column; gap: 10px; }
+
+/* Reference-doc label variants, smaller than the booklet's. */
+.tlab { font-family: var(--font-mono); font-size: 9.5px; fill: var(--ink); }
+.tlab-mid { text-anchor: middle; }
+.tlab-end { text-anchor: end; }
+.portbox { fill: none; stroke: var(--brass); stroke-width: 1.6; stroke-dasharray: 4 3; }
+.porttag { font-family: var(--font-mono); font-size: 9px; fill: var(--brass); letter-spacing: 0.08em; }

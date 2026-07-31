@@ -1,172 +1,19 @@
+<meta charset="utf-8">
 <title>Bodhi's Signal Box — Breadboard Layouts</title>
 
+<link rel="stylesheet" href="lib/kit.css">
 <style>
-  :root {
-    --bg: #F2F4F1;
-    --surface: #FFFFFF;
-    --surface-2: #E7EBE5;
-    --ink: #14201B;
-    --ink-2: #55635C;
-    --ink-3: #7C8A82;
-    --rule: #D3D9D0;
-    --rule-strong: #B6BFB6;
-    --brass: #8A6D14;
-    --copper: #A2451A;
-
-    --bb-body: #E4E6DF;
-    --bb-edge: #C3C7BC;
-    --bb-hole: #9AA096;
-    --bb-channel: #D2D5CB;
-    --bb-text: #6E7A70;
-
-    --w-5v:  #C93A31;
-    --w-3v3: #C2610C;
-    --w-gnd: #33403A;
-    --w-s1:  #B8890A;
-    --w-s2:  #2C6FC4;
-    --w-s3:  #1E8A52;
-    --w-sig: #7A4FBF;
-
-    --font-display: "Avenir Next Condensed", "HelveticaNeue-CondensedBold", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
-    --font-body: "Charter", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-    --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-
-    --measure: 68ch;
-    --wide: 1020px;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0B1310; --surface: #121C18; --surface-2: #1A2620;
-      --ink: #E4EDE7; --ink-2: #9DABA3; --ink-3: #77857D;
-      --rule: #253229; --rule-strong: #35463B;
-      --brass: #D9B356; --copper: #E0813F;
-      --bb-body: #2A322C; --bb-edge: #3A443C; --bb-hole: #59645C;
-      --bb-channel: #222A25; --bb-text: #8B978F;
-      --w-5v: #E85F54; --w-3v3: #E0813F; --w-gnd: #A9B7AF;
-      --w-s1: #E3B93C; --w-s2: #5C9BEA; --w-s3: #45C07E; --w-sig: #A87FE0;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #0B1310; --surface: #121C18; --surface-2: #1A2620;
-    --ink: #E4EDE7; --ink-2: #9DABA3; --ink-3: #77857D;
-    --rule: #253229; --rule-strong: #35463B;
-    --brass: #D9B356; --copper: #E0813F;
-    --bb-body: #2A322C; --bb-edge: #3A443C; --bb-hole: #59645C;
-    --bb-channel: #222A25; --bb-text: #8B978F;
-    --w-5v: #E85F54; --w-3v3: #E0813F; --w-gnd: #A9B7AF;
-    --w-s1: #E3B93C; --w-s2: #5C9BEA; --w-s3: #45C07E; --w-sig: #A87FE0;
-  }
-  :root[data-theme="light"] {
-    --bg: #F2F4F1; --surface: #FFFFFF; --surface-2: #E7EBE5;
-    --ink: #14201B; --ink-2: #55635C; --ink-3: #7C8A82;
-    --rule: #D3D9D0; --rule-strong: #B6BFB6;
-    --brass: #8A6D14; --copper: #A2451A;
-    --bb-body: #E4E6DF; --bb-edge: #C3C7BC; --bb-hole: #9AA096;
-    --bb-channel: #D2D5CB; --bb-text: #6E7A70;
-    --w-5v: #C93A31; --w-3v3: #C2610C; --w-gnd: #33403A;
-    --w-s1: #B8890A; --w-s2: #2C6FC4; --w-s3: #1E8A52; --w-sig: #7A4FBF;
-  }
-
-  body {
-    background: var(--bg); color: var(--ink);
-    font-family: var(--font-body); font-size: 17px; line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
-  .page { max-width: var(--wide); margin: 0 auto; padding: 0 24px 90px; }
-
-  h1, h2, h3 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; }
-  h1 { font-size: clamp(2.4rem, 5.5vw, 3.6rem); line-height: 1.03; }
-  h2 { font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.12; }
-  h3 { font-size: 1.1rem; }
-  p { margin: 0; max-width: var(--measure); }
-
-  .eyebrow {
-    font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.16em;
-    text-transform: uppercase; color: var(--brass);
-  }
-  code { font-family: var(--font-mono); font-size: 0.85em; background: var(--surface-2); padding: 0.1em 0.36em; border-radius: 3px; }
-
-  header.masthead {
-    padding: 66px 0 34px; border-bottom: 2px solid var(--ink);
-    display: flex; flex-direction: column; gap: 16px;
-  }
-  .masthead .lede { font-size: 1.15rem; color: var(--ink-2); max-width: 58ch; }
-
-  section { padding: 40px 0; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 20px; }
-  section:last-of-type { border-bottom: none; }
-
-  /* ---- variation switcher ---- */
-  .switch { display: flex; flex-wrap: wrap; gap: 8px; }
-  .switch button {
-    font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.04em;
-    padding: 9px 15px; border-radius: 3px; cursor: pointer;
-    background: var(--surface); color: var(--ink-2);
-    border: 1px solid var(--rule-strong);
-  }
-  .switch button:hover { color: var(--ink); border-color: var(--ink-3); }
-  .switch button[aria-pressed="true"] {
-    background: var(--ink); color: var(--bg); border-color: var(--ink);
-  }
-  .switch button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
-
-  .figbox {
-    background: var(--surface); border: 1px solid var(--rule);
-    border-radius: 4px; padding: 14px; overflow-x: auto;
-  }
-  .figbox svg { display: block; min-width: 900px; width: 100%; height: auto; }
-
-  /* breadboard primitives */
-  .bb-body { fill: var(--bb-body); stroke: var(--bb-edge); stroke-width: 1.5; }
-  .bb-channel { fill: var(--bb-channel); }
-  .bb-hole { fill: var(--bb-hole); opacity: 0.55; }
-  .bb-lbl { font-family: var(--font-mono); font-size: 8.5px; fill: var(--bb-text); }
-  .rail-pos { stroke: var(--w-5v); stroke-width: 1.6; opacity: 0.75; }
-  .rail-neg { stroke: var(--w-gnd); stroke-width: 1.6; opacity: 0.55; }
-
-  .wire-out { fill: none; stroke: rgba(0,0,0,0.42); stroke-linecap: round; stroke-linejoin: round; }
-  .wire-in  { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .lead { stroke: var(--ink-3); stroke-width: 1.6; fill: none; }
-  .rbody { fill: var(--surface); stroke: var(--ink); stroke-width: 1.4; }
-  .part { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; }
-  .tlab { font-family: var(--font-mono); font-size: 9.5px; fill: var(--ink); }
-  .tlab-mid { text-anchor: middle; }
-  .tlab-end { text-anchor: end; }
-  .tval { font-family: var(--font-mono); font-size: 9px; fill: var(--ink); font-weight: 600; }
-  .tmod { font-family: var(--font-display); font-size: 13px; fill: var(--ink); font-weight: 600; }
-  .tpin { font-family: var(--font-mono); font-size: 9px; fill: var(--ink-2); }
-  .portbox { fill: none; stroke: var(--brass); stroke-width: 1.6; stroke-dasharray: 4 3; }
-  .porttag { font-family: var(--font-mono); font-size: 9px; fill: var(--brass); letter-spacing: 0.08em; }
-
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-2); }
-  .legend span { display: inline-flex; align-items: center; gap: 7px; }
-  .swatch { width: 18px; height: 3px; border-radius: 2px; flex: none; }
-
-  .callout { border-left: 3px solid var(--brass); padding: 4px 0 4px 18px; display: flex; flex-direction: column; gap: 8px; }
-  .callout .label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); }
-
-  .varnote { display: flex; flex-direction: column; gap: 10px; }
-  .maptable { border-collapse: collapse; font-family: var(--font-mono); font-size: 0.78rem; }
-  .maptable td { padding: 4px 16px 4px 0; border-bottom: 1px solid var(--rule); }
-  .maptable td:first-child { color: var(--ink-2); }
-
-  ul.plain { margin: 0; padding-left: 1.1em; max-width: var(--measure); }
-  ul.plain li { margin-bottom: 7px; }
-
-  footer { padding: 34px 0 0; font-family: var(--font-mono); font-size: 0.73rem; color: var(--ink-3); line-height: 1.8; }
-
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
-
-  /* The extension board is a real dark PCB sitting on the breadboard, so it
-     keeps the same colours in both themes — it reads as an object covering
-     those holes, not as a diagram element. */
-  .extbody { fill: #1E2723; stroke: #55655B; stroke-width: 1.3; }
-  .extlbl {
-    font-family: var(--font-mono); font-size: 6.6px; fill: #A9B8AE;
-    letter-spacing: 0.04em;
-  }
-  .extlbl.on { fill: #F0C255; font-weight: 700; }
-  .exttxt { font-family: var(--font-mono); font-size: 7.5px; fill: #C3D0C7; text-anchor: middle; }
+  /* A reference sheet for the grown-up, so it runs wider than the booklet. */
+  :root { --page-max: 1020px; }
+  .page { padding: 0 24px 90px; }
+  header.masthead { padding: 66px 0 34px; }
+  section { padding: 40px 0; gap: 20px; }
+  /* Denser diagram, so its printed labels are smaller than the booklet's. */
+  .bb-lbl { font-size: 8.5px; }
+  .extlbl { font-size: 6.6px; letter-spacing: 0.04em; }
+  .exttxt { font-size: 7.5px; }
+  .tval { font-size: 9px; }
+  .tpin { font-size: 9px; }
 </style>
 
 <div class="page">
@@ -222,250 +69,190 @@
 
   <footer>
     Bodhi's Signal Box · pin map in docs/extension-board.md · schematic view in docs/build-guide.html<br>
-    Port positions 58–63 are fixed: 5V · 3V3 · GND · S1 · S2 · S3
+    Port positions 58–63 are fixed: 5V · 3V3 · GND · S1 · S2 · S3<br>
+    Drawn with <code>docs/lib/</code> — the same breadboard the step-through booklet uses.
   </footer>
 </div>
 
+<!-- The breadboard, the parts and the extension board come from the shared kit.
+     No narrator and no typewriter here: this is a reference sheet for the
+     grown-up, not a lesson, which is the proof the three parts compose rather
+     than being welded together. -->
+<script src="lib/breadboard.js"></script>
+<script src="lib/parts.js"></script>
+<script src="lib/overlays/freenove-ext.js"></script>
 <script>
 (function () {
-  const PITCH = 13, X0 = 46;
-  // Rows top to bottom: j i h g f | channel | e d c b a, plus four power rails.
-  const ROW = { Pt:21, Ptn:34, J:70, I:83, H:96, G:109, F:122,
-                E:161, D:174, C:187, B:200, A:213, Pb:258, Pbn:271 };
-  const TOPHALF = ['J','I','H','G','F'], BOTHALF = ['E','D','C','B','A'];
-  const RAILS = ['Pt','Ptn','Pb','Pbn'];
-  const NCOL = 63;
-  const EXT_FROM = 13, EXT_TO = 32;
+  'use strict';
 
-  const hx = c => X0 + (c - 1) * PITCH;
-  const hy = r => ROW[r];
-  const pt = ([r, c]) => ({ x: hx(c), y: hy(r) });
-  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-  // ---------- primitives ----------
-  function rawWire(points, color) {
-    const d = points.map((q, i) => (i ? 'L' : 'M') + q.x.toFixed(1) + ' ' + q.y.toFixed(1)).join(' ');
-    return `<path class="wire-out" d="${d}" stroke-width="5.2"/>` +
-           `<path class="wire-in" d="${d}" stroke="${color}" stroke-width="3.2"/>`;
-  }
-  const wire = (a, b, color, via) => rawWire([pt(a), ...(via || []), pt(b)], color);
-
-  function resistor(a, b, label) {
-    const p1 = pt(a), p2 = pt(b);
-    const dx = p2.x - p1.x, dy = p2.y - p1.y, len = Math.hypot(dx, dy);
-    const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-    const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
-    const bw = Math.max(18, Math.min(30, len - 14)), bh = 9.5;
-    const perp = { x: -dy / len, y: dx / len };
-    return `<line class="lead" x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}"/>` +
-      `<g transform="translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})">` +
-      `<rect class="rbody" x="${(-bw/2).toFixed(1)}" y="${-bh/2}" width="${bw.toFixed(1)}" height="${bh}" rx="2"/></g>` +
-      `<text class="tval tlab-mid" x="${(mx + perp.x*12).toFixed(1)}" y="${(my + perp.y*12 + 3).toFixed(1)}">${esc(label)}</text>`;
-  }
-
-  function led(row, cA, cK, tone) {
-    const a = pt([row, cA]), k = pt([row, cK]);
-    const cx = (a.x + k.x) / 2, cy = a.y - 9;
-    return `<line class="lead" x1="${a.x}" y1="${a.y}" x2="${cx}" y2="${cy}"/>` +
-      `<line class="lead" x1="${k.x}" y1="${k.y}" x2="${cx}" y2="${cy}"/>` +
-      `<circle cx="${cx}" cy="${cy}" r="6" fill="${tone}" stroke="var(--ink)" stroke-width="1.2"/>` +
-      `<text class="tpin" x="${a.x - 11}" y="${a.y + 4}">+</text>`;
-  }
-
-  function transistor(row, cE, cB, cC) {
-    const e = pt([row, cE]), b = pt([row, cB]), c = pt([row, cC]);
-    const cy = b.y + 12;
-    return `<line class="lead" x1="${e.x}" y1="${e.y}" x2="${b.x - 4}" y2="${cy}"/>` +
-      `<line class="lead" x1="${b.x}" y1="${b.y}" x2="${b.x}" y2="${cy}"/>` +
-      `<line class="lead" x1="${c.x}" y1="${c.y}" x2="${b.x + 4}" y2="${cy}"/>` +
-      `<path class="part" d="M${b.x - 11} ${cy} a11 11 0 0 0 22 0 z"/>` +
-      `<text class="tpin tlab-mid" x="${b.x}" y="${cy + 20}">S8050 · E B C</text>`;
-  }
-
-  function block(x, y, w, h, title, sub) {
-    return `<rect class="part" x="${x}" y="${y}" width="${w}" height="${h}" rx="4"/>` +
-      `<text class="tmod tlab-mid" x="${x + w/2}" y="${y + 19}">${esc(title)}</text>` +
-      (sub ? `<text class="tpin tlab-mid" x="${x + w/2}" y="${y + 33}">${esc(sub)}</text>` : '');
-  }
-
-  // ---------- the breadboard ----------
-  function boardSvg() {
-    let s = `<rect class="bb-body" x="26" y="6" width="846" height="282" rx="6"/>`;
-    s += `<rect class="bb-channel" x="26" y="131" width="846" height="21"/>`;
-    s += `<line class="rail-pos" x1="34" y1="13" x2="864" y2="13"/>`;
-    s += `<line class="rail-neg" x1="34" y1="42" x2="864" y2="42"/>`;
-    s += `<line class="rail-pos" x1="34" y1="250" x2="864" y2="250"/>`;
-    s += `<line class="rail-neg" x1="34" y1="279" x2="864" y2="279"/>`;
-    for (let c = 1; c <= NCOL; c++) {
-      TOPHALF.concat(BOTHALF).forEach(r => {
-        s += `<circle class="bb-hole" cx="${hx(c)}" cy="${hy(r)}" r="2.8"/>`;
-      });
-      if (c % 6 !== 0) RAILS.forEach(r => {
-        s += `<circle class="bb-hole" cx="${hx(c)}" cy="${hy(r)}" r="2.8"/>`;
-      });
+  /* A denser drawing than the booklet, so it keeps its own hand-tuned row table
+     and board chrome rather than the pitch-derived defaults. Everything below
+     the geometry is shared code. */
+  var board = BBKit.board({
+    pitch: 13, cols: 63, pad: 46,
+    rows: { Pt: 21, Ptn: 34, J: 70, I: 83, H: 96, G: 109, F: 122,
+            E: 161, D: 174, C: 187, B: 200, A: 213, Pb: 258, Pbn: 271 },
+    chrome: {
+      left: 26, boardW: 846, rx: 6, top: 6, bottom: 288,
+      holeR: 2.8, railInset: 8, chanInset: 9,
+      railX0: 34, railX1: 864,
+      posDyUp: 9, posDyDown: 13,
+      rowLabelX: 33, rowLabelXRight: 862
     }
-    ['J','I','H','G','F','E','D','C','B','A'].forEach(r => {
-      s += `<text class="bb-lbl" x="33" y="${hy(r)+3}">${r.toLowerCase()}</text>`;
-      s += `<text class="bb-lbl" x="862" y="${hy(r)+3}">${r.toLowerCase()}</text>`;
+  });
+
+  var P = BBKit.parts;
+  var X = board.X, Y = board.Y;
+  var W = BBKit.COLOR;
+
+  /* Only one side of most positions is actually in use, so the two spines are
+     highlighted separately rather than as one merged set. */
+  var HOT = { d: [19, 20, 25, 26, 27, 29, 31], g: [14, 20, 21, 24, 28] };
+
+  function wire(a, b, color, via) { return P.wire(board, { a: a, b: b, c: color, via: via }).svg; }
+  function res(a, b, v) { return P.resistor(board, { a: a, b: b, v: v }).svg; }
+
+  /* The extension board, plus this sheet's own annotations about it. No pads or
+     drop shadow at this scale — they turn the pin spine into mud. */
+  function extension() {
+    var s = BBKit.overlays['freenove-ext'](board, HOT, {
+      pads: false, shadow: false, caption: 'covers the whole left end'
     });
-    for (let c = 5; c <= NCOL; c += 5) {
-      s += `<text class="bb-lbl" x="${hx(c)}" y="${hy('J')-9}" text-anchor="middle">${c}</text>`;
-      s += `<text class="bb-lbl" x="${hx(c)}" y="${hy('A')+13}" text-anchor="middle">${c}</text>`;
-    }
+    var x = X(13) - 7, w = (32 - 13) * board.pitch + 14;
+    s += '<text class="tpin" x="' + (x + w / 2) + '" y="146">' +
+      'Freenove GPIO Extension Board · WROVER plugs in on top</text>';
+    s += '<text class="porttag" x="' + x + '" y="97">pins in row g ↑</text>';
+    s += '<text class="porttag" x="' + x + '" y="192">pins in row d ↓</text>';
     return s;
   }
 
-  // ---------- the extension board, pins in columns d and g ----------
-  const D_LABELS = ['3.3V','EN','36','39','34','35','32','33','25','26','27','14','12','GND','13','3.3V','3.3V','3.3V','5V','5V'];
-  const G_LABELS = ['GND','23','22','TX','RX','21','GND','19','18','5','GND','4','0','2','15','GND','GND','GND','GND','GND'];
-  const D_USED = new Set([19,20,25,26,27,29,31]);
-  const G_USED = new Set([14,20,21,24,28]);
+  /* ---- the fixed build: identical on every variant ---------------------- */
+  function base() {
+    var s = extension();
 
-  // The PCB's real footprint. The pins are only at 13-32, but the board covers
-  // the entire left end of the breadboard including both power rails (1-12),
-  // and its terminal blocks reach to 16 — so positions 1-17 on the rails and
-  // 1-12 everywhere are physically unusable, however free they look.
-  function extSvg() {
-    const xA = hx(1) - 8, xB = hx(12) + 7, xC = hx(16) + 7, xD = hx(EXT_TO) + 7;
-    const yT = 10, yB = 284, railT = 46, railB = 245, spineT = 102, spineB = 181;
-    const d = [`M${xA} ${yT}`, `H${xC}`, `V${railT}`, `H${xB}`, `V${spineT}`, `H${xD}`,
-               `V${spineB}`, `H${xB}`, `V${railB}`, `H${xC}`, `V${yB}`, `H${xA}`, 'Z'].join(' ');
-    const x = hx(EXT_FROM) - 7, w = (EXT_TO - EXT_FROM) * PITCH + 14;
-    let s = `<path class="extbody" d="${d}"/>`;
-    s += `<text class="exttxt" x="${(xA + xB) / 2}" y="${(spineT + spineB) / 2}">covers the whole left end</text>`;
-    s += `<text class="exttxt" x="${(hx(13) + hx(16)) / 2}" y="32">3V3 GND</text>`;
-    s += `<text class="exttxt" x="${(hx(13) + hx(16)) / 2}" y="268">5V GND</text>`;
-    for (let i = 0; i < D_LABELS.length; i++) {
-      const p = EXT_FROM + i;
-      const on = D_USED.has(p);
-      s += `<text class="extlbl${on ? ' on' : ''}" transform="translate(${hx(p)+3.5} 179) rotate(-90)">${esc(D_LABELS[i])}</text>`;
-      s += `<text class="extlbl${G_USED.has(p) ? ' on' : ''}" transform="translate(${hx(p)+3.5} 136) rotate(-90)">${esc(G_LABELS[i])}</text>`;
-    }
-    s += `<text class="tpin tlab-mid" x="${x + w/2}" y="146" text-anchor="middle">Freenove GPIO Extension Board · WROVER plugs in on top</text>`;
-    s += `<text class="porttag" x="${x}" y="97">pins in row g ↑</text>`;
-    s += `<text class="porttag" x="${x}" y="192">pins in row d ↓</text>`;
-    return s;
-  }
-
-  const W = { v5:'var(--w-5v)', v3:'var(--w-3v3)', gnd:'var(--w-gnd)',
-              s1:'var(--w-s1)', s2:'var(--w-s2)', s3:'var(--w-s3)', sig:'var(--w-sig)' };
-
-  // ---------- the fixed build ----------
-  function baseSvg() {
-    let s = extSvg();
-
-    // --- top half: four LEDs, tapping the g-side pins from row j ---
-    const leds = [[14,34,35,62,'#D94F3D'], [20,38,39,56,'#E0A32E'],
-                  [21,42,43,50,'#3E9E5A'], [24,46,47,44,'#3F7FD0']];
-    leds.forEach(([src, ca, ck, lane, tone]) => {
-      s += wire(['J',src], ['J',ca], W.sig, [{x:hx(src),y:lane},{x:hx(ca),y:lane}]);
-      s += led('H', ca, ck, tone);
-      s += resistor(['I',ck], ['Ptn',ck], '220');
+    // Four LEDs, tapping the g-side pins from row j.
+    [[14, 34, 35, 62, '#D94F3D'], [20, 38, 39, 56, '#E0A32E'],
+     [21, 42, 43, 50, '#3E9E5A'], [24, 46, 47, 44, '#3F7FD0']].forEach(function (L) {
+      var src = L[0], ca = L[1], ck = L[2], lane = L[3], tone = L[4];
+      s += wire(['J', src], ['J', ca], W.sig, [{ x: X(src), y: lane }, { x: X(ca), y: lane }]);
+      s += P.led(board, { row: 'H', a: ca, b: ck, tone: tone }).svg;
+      s += res(['I', ck], ['Ptn', ck], '220');
     });
-    s += wire(['J',28], ['Ptn',28], W.gnd);   // GND up to the top rail
+    s += wire(['J', 28], ['Ptn', 28], W.gnd);   // GND up to the top rail
 
-    // --- bottom rails, fed once each from the extension board ---
-    s += wire(['A',31], ['Pb',31], W.v5);
-    s += wire(['A',26], ['Pbn',26], W.gnd);
+    // Bottom rails, fed once each from the extension board.
+    s += wire(['A', 31], ['Pb', 31], W.v5);
+    s += wire(['A', 26], ['Pbn', 26], W.gnd);
 
-    // --- buzzer stage ---
-    // Positions 1-12 are NOT free: the extension board's PCB physically covers
-    // them, rails included. Everything lives in 33-63.
-    s += wire(['A',25], ['A',35], W.sig, [{x:hx(25),y:222},{x:hx(35),y:222}]);
-    s += resistor(['D',35], ['D',39], '1k');
-    s += transistor('C', 38, 39, 40);
-    s += wire(['B',38], ['Pbn',38], W.gnd);
-    s += wire(['B',40], ['B',42], W.gnd);
-    s += `<rect class="part" x="${hx(42)-6}" y="${hy('C')-19}" width="${PITCH*2+12}" height="17" rx="3"/>`;
-    s += `<text class="tpin tlab-mid" x="${(hx(42)+hx(44))/2}" y="${hy('C')-7}">BUZZ</text>`;
-    s += `<line class="lead" x1="${hx(42)}" y1="${hy('C')}" x2="${hx(42)}" y2="${hy('C')-2}"/>`;
-    s += `<line class="lead" x1="${hx(44)}" y1="${hy('C')}" x2="${hx(44)}" y2="${hy('C')-2}"/>`;
-    s += wire(['B',44], ['Pb',44], W.v5);
+    /* Buzzer stage. Positions 1-12 are NOT free — the extension board's PCB
+       physically covers them, rails included — so everything lives in 33-63. */
+    s += wire(['A', 25], ['A', 35], W.sig, [{ x: X(25), y: 222 }, { x: X(35), y: 222 }]);
+    s += res(['D', 35], ['D', 39], '1k');
+    s += P.transistor(board, { row: 'C', e: 38, b: 39, c: 40 }).svg;
+    s += wire(['B', 38], ['Pbn', 38], W.gnd);
+    s += wire(['B', 40], ['B', 42], W.gnd, []);   // straight across, no lane
+    s += '<rect class="part" x="' + (X(42) - 6) + '" y="' + (Y('C') - 19) +
+      '" width="' + (board.pitch * 2 + 12) + '" height="17" rx="3"/>';
+    s += '<text class="tpin" x="' + ((X(42) + X(44)) / 2) + '" y="' + (Y('C') - 7) + '">BUZZ</text>';
+    s += '<line class="lead" x1="' + X(42) + '" y1="' + Y('C') + '" x2="' + X(42) + '" y2="' + (Y('C') - 2) + '"/>';
+    s += '<line class="lead" x1="' + X(44) + '" y1="' + Y('C') + '" x2="' + X(44) + '" y2="' + (Y('C') - 2) + '"/>';
+    s += wire(['B', 44], ['Pb', 44], W.v5);
 
-    // --- port network: dividers, then the runs back to the extension board ---
-    s += resistor(['D',61], ['D',55], '1k');
-    s += resistor(['E',62], ['E',53], '10k');
-    s += resistor(['D',53], ['Pbn',53], '20k');
-    s += resistor(['E',63], ['E',51], '10k');
-    s += resistor(['D',51], ['Pbn',51], '20k');
+    // Port network: the dividers, then the runs back to the extension board.
+    s += res(['D', 61], ['D', 55], '1k');
+    s += res(['E', 62], ['E', 53], '10k');
+    s += res(['D', 53], ['Pbn', 53], '20k');
+    s += res(['E', 63], ['E', 51], '10k');
+    s += res(['D', 51], ['Pbn', 51], '20k');
 
-    s += wire(['B',27], ['B',55], W.s1, [{x:hx(27),y:229},{x:hx(55),y:229}]);
-    s += wire(['C',19], ['C',53], W.s2, [{x:hx(19),y:236},{x:hx(53),y:236}]);
-    s += wire(['C',20], ['C',51], W.s3, [{x:hx(20),y:243},{x:hx(51),y:243}]);
-    s += wire(['C',30], ['C',59], W.v3, [{x:hx(30),y:250},{x:hx(59),y:250}]);
-    s += wire(['C',58], ['Pb',58], W.v5);
-    s += wire(['D',60], ['Pbn',60], W.gnd);
+    s += wire(['B', 27], ['B', 55], W.s1, [{ x: X(27), y: 229 }, { x: X(55), y: 229 }]);
+    s += wire(['C', 19], ['C', 53], W.s2, [{ x: X(19), y: 236 }, { x: X(53), y: 236 }]);
+    s += wire(['C', 20], ['C', 51], W.s3, [{ x: X(20), y: 243 }, { x: X(51), y: 243 }]);
+    s += wire(['C', 30], ['C', 59], W.v3, [{ x: X(30), y: 250 }, { x: X(59), y: 250 }]);
+    s += wire(['C', 58], ['Pb', 58], W.v5);
+    s += wire(['D', 60], ['Pbn', 60], W.gnd);
 
-    // --- the port: six positions, rows a and b kept clear for the plug ---
-    const px = hx(58) - 7, pw = 5 * PITCH + 14;
-    s += `<rect class="portbox" x="${px}" y="${hy('B')-8}" width="${pw}" height="26" rx="3"/>`;
-    s += `<text class="porttag" x="${px + pw/2}" y="${hy('A')+26}" text-anchor="middle">THE PORT — rows a &amp; b</text>`;
-    [[58,'5V'],[59,'3V3'],[60,'GND'],[61,'S1'],[62,'S2'],[63,'S3']].forEach(([c,n]) => {
-      s += `<text class="porttag" x="${hx(c)}" y="${hy('C')-9}" text-anchor="middle">${n}</text>`;
+    // The port itself: six positions, rows a and b kept clear for the plug.
+    var px = X(58) - 7, pw = 5 * board.pitch + 14;
+    s += '<rect class="portbox" x="' + px + '" y="' + (Y('B') - 8) + '" width="' + pw + '" height="26" rx="3"/>';
+    s += '<text class="porttag" x="' + (px + pw / 2) + '" y="' + (Y('A') + 26) +
+      '" text-anchor="middle">THE PORT — rows a &amp; b</text>';
+    [[58, '5V'], [59, '3V3'], [60, 'GND'], [61, 'S1'], [62, 'S2'], [63, 'S3']].forEach(function (c) {
+      s += '<text class="porttag" x="' + X(c[0]) + '" y="' + (Y('C') - 9) +
+        '" text-anchor="middle">' + c[1] + '</text>';
     });
     return s;
   }
 
-  // ---------- the part that changes ----------
-  const VARIATIONS = [
-    { id:'ultrasonic', tab:'Ultrasonic', title:'HC-SR04', sub:'the binoculars',
-      lines:[['VCC',58,W.v5],['Trig',61,W.s1],['Echo',62,W.s2],['GND',60,W.gnd]],
-      plays:'Reach the Target', how:'Move a hand closer to the sensor to push the lights up.',
-      note:'The only module that uses S1 as an <em>output</em> — that is the trigger pulse the box fires to find it. Aim it at the table rather than across an open room, or it eventually decides it has been unplugged.' },
-    { id:'joystick', tab:'Joystick', title:'Joystick', sub:'dual axis + click',
-      lines:[['+5V',58,W.v5],['SW',61,W.s1],['VRx',62,W.s2],['VRy',63,W.s3],['GND',60,W.gnd]],
-      plays:'Reach the Target', how:'Push the stick up and down to move the meter.',
-      note:'The only module that fills all three signal positions. VRy drives the meter because "push up to go up" is what a child expects; the click arrives on S1.' },
-    { id:'motion', tab:'Motion', title:'HC-SR501', sub:'the white dome',
-      lines:[['VCC',58,W.v5],['OUT',63,W.s3],['GND',60,W.gnd]],
-      plays:'Wave on Green', how:'Wait for the countdown, then wave as fast as you can.',
-      note:'Three wires only. An idle PIR is indistinguishable from an empty port through the divider, so <b>the first wave is what identifies it</b> — plug it in, wave, and it announces itself.' },
-    { id:'light', tab:'Photoresistor', title:'Light module', sub:'analog out',
-      lines:[['VCC',58,W.v5],['AO',62,W.s2],['GND',60,W.gnd]],
-      plays:'Reach the Target', how:'Cup a hand over it to fill the meter.',
-      note:'Uses S2 and leaves S3 quiet, which is exactly how the box tells it apart from the joystick. If covering it empties the meter instead, flip <code>kCoveringRaises</code> in <code>DriverLight.cpp</code>.' }
+  /* ---- the part that changes -------------------------------------------- */
+  var VARIATIONS = [
+    { id: 'ultrasonic', tab: 'Ultrasonic', title: 'HC-SR04', sub: 'the binoculars',
+      lines: [['VCC', 58, W.v5], ['Trig', 61, W.s1], ['Echo', 62, W.s2], ['GND', 60, W.gnd]],
+      plays: 'Reach the Target', how: 'Move a hand closer to the sensor to push the lights up.',
+      note: 'The only module that uses S1 as an <em>output</em> — that is the trigger pulse the box fires to find it. Aim it at the table rather than across an open room, or it eventually decides it has been unplugged.' },
+    { id: 'joystick', tab: 'Joystick', title: 'Joystick', sub: 'dual axis + click',
+      lines: [['+5V', 58, W.v5], ['SW', 61, W.s1], ['VRx', 62, W.s2], ['VRy', 63, W.s3], ['GND', 60, W.gnd]],
+      plays: 'Reach the Target', how: 'Push the stick up and down to move the meter.',
+      note: 'The only module that fills all three signal positions. VRy drives the meter because "push up to go up" is what a child expects; the click arrives on S1.' },
+    { id: 'motion', tab: 'Motion', title: 'HC-SR501', sub: 'the white dome',
+      lines: [['VCC', 58, W.v5], ['OUT', 63, W.s3], ['GND', 60, W.gnd]],
+      plays: 'Wave on Green', how: 'Wait for the countdown, then wave as fast as you can.',
+      note: 'Three wires only. An idle PIR is indistinguishable from an empty port through the divider, so <b>the first wave is what identifies it</b> — plug it in, wave, and it announces itself.' },
+    { id: 'light', tab: 'Photoresistor', title: 'Light module', sub: 'analog out',
+      lines: [['VCC', 58, W.v5], ['AO', 62, W.s2], ['GND', 60, W.gnd]],
+      plays: 'Reach the Target', how: 'Cup a hand over it to fill the meter.',
+      note: 'Uses S2 and leaves S3 quiet, which is exactly how the box tells it apart from the joystick. If covering it empties the meter instead, flip <code>kCoveringRaises</code> in <code>DriverLight.cpp</code>.' }
   ];
 
+  /* The module hangs off the board on the end of one bundled plug, so it is
+     placed in pixels rather than holes — it genuinely is not in any hole. */
   function moduleSvg(v) {
-    const bx = 620, by = 344, bw = 280, bh = 56;
-    let s = '';
-    const n = v.lines.length;
-    v.lines.forEach(([label, col, color], i) => {
-      const fx = bx + 24 + i * ((bw - 48) / Math.max(1, n - 1));
-      const lane = 326 - i * 6;
-      s += rawWire([pt(['A',col]), {x:hx(col),y:lane}, {x:fx,y:lane}, {x:fx,y:by}], color);
-      s += `<text class="tpin tlab-mid" x="${fx}" y="${by-6}" text-anchor="middle">${esc(label)}</text>`;
+    var bx = 620, by = 344, bw = 280, bh = 56;
+    var n = v.lines.length;
+    var s = '';
+    v.lines.forEach(function (line, i) {
+      var label = line[0], col = line[1], color = line[2];
+      var fx = bx + 24 + i * ((bw - 48) / Math.max(1, n - 1));
+      var lane = 326 - i * 6;
+      s += P.rawWire(board, [board.pt(['A', col]), { x: X(col), y: lane },
+        { x: fx, y: lane }, { x: fx, y: by }], color);
+      s += '<text class="tpin" x="' + fx + '" y="' + (by - 6) + '">' + BBKit.esc(label) + '</text>';
     });
-    const sx = hx(58) - 15, sw2 = 5 * PITCH + 30;
-    s += `<rect x="${sx}" y="296" width="${sw2}" height="38" rx="12" fill="var(--surface-2)" stroke="var(--ink-3)" stroke-width="1.3" opacity="0.9"/>`;
-    s += `<text class="tpin" x="${sx + sw2 + 8}" y="318">one bundled plug</text>`;
-    s += block(bx, by, bw, bh, v.title, v.sub);
+    var sx = X(58) - 15, sw2 = 5 * board.pitch + 30;
+    s += '<rect x="' + sx + '" y="296" width="' + sw2 + '" height="38" rx="12" ' +
+      'fill="var(--surface-2)" stroke="var(--ink-3)" stroke-width="1.3" opacity="0.9"/>';
+    s += '<text class="tpin" x="' + (sx + sw2 + 8) + '" y="318" text-anchor="start">one bundled plug</text>';
+    s += P.block(board, { x: bx, y: by, w: bw, h: bh, title: v.title, sub: v.sub }).svg;
     return s;
   }
 
-  const svg = document.getElementById('bbsvg');
-  const sw = document.getElementById('switch');
-  const note = document.getElementById('varnote');
+  var svg = document.getElementById('bbsvg');
+  var sw = document.getElementById('switch');
+  var note = document.getElementById('varnote');
+  var NAMES = { 58: '5V', 59: '3V3', 60: 'GND', 61: 'S1 · GPIO 13', 62: 'S2 · GPIO 32', 63: 'S3 · GPIO 33' };
 
   function render(i) {
-    const v = VARIATIONS[i];
-    svg.innerHTML = boardSvg() + baseSvg() + moduleSvg(v);
-    const NAMES = {58:'5V',59:'3V3',60:'GND',61:'S1 · GPIO 13',62:'S2 · GPIO 32',63:'S3 · GPIO 33'};
+    var v = VARIATIONS[i];
+    svg.innerHTML = board.svg() + base() + moduleSvg(v);
     note.innerHTML =
-      `<h3>${esc(v.title)} — ${esc(v.plays)}</h3><p>${v.how}</p>` +
-      `<table class="maptable"><tbody>` +
-      v.lines.map(([label, col]) =>
-        `<tr><td>${esc(label)}</td><td>position ${col}, row a</td><td>${NAMES[col]}</td></tr>`).join('') +
-      `</tbody></table><p>${v.note}</p>`;
-    [...sw.children].forEach((b, j) => b.setAttribute('aria-pressed', String(j === i)));
+      '<h3>' + BBKit.esc(v.title) + ' — ' + BBKit.esc(v.plays) + '</h3><p>' + v.how + '</p>' +
+      '<table class="maptable"><tbody>' +
+      v.lines.map(function (line) {
+        return '<tr><td>' + BBKit.esc(line[0]) + '</td><td>position ' + line[1] +
+          ', row a</td><td>' + NAMES[line[1]] + '</td></tr>';
+      }).join('') +
+      '</tbody></table><p>' + v.note + '</p>';
+    Array.prototype.forEach.call(sw.children, function (b, j) {
+      b.setAttribute('aria-pressed', String(j === i));
+    });
   }
 
-  VARIATIONS.forEach((v, i) => {
-    const b = document.createElement('button');
+  VARIATIONS.forEach(function (v, i) {
+    var b = document.createElement('button');
     b.type = 'button';
     b.textContent = v.tab;
     b.setAttribute('aria-pressed', 'false');
-    b.addEventListener('click', () => render(i));
+    b.addEventListener('click', function () { render(i); });
     sw.appendChild(b);
   });
   render(0);

@@ -1,0 +1,90 @@
+<meta charset="utf-8">
+<title>Teaching notes — everything that isn't for Bodhi</title>
+
+<link rel="stylesheet" href="lib/kit.css">
+<style>
+  :root { --page-max: 980px; }
+  .notes-lesson { border-bottom: 1px solid var(--rule); }
+  .notes-build { display: flex; flex-direction: column; gap: 10px; margin-top: 26px; }
+  .notes-build h3 { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .notes-build .tag {
+    font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--copper);
+    border: 1px solid var(--copper); border-radius: 3px; padding: 2px 7px;
+  }
+  .grown-only { border-left: 3px solid var(--copper); padding-left: 18px; }
+  .why { color: var(--ink-2); max-width: 68ch; }
+  .notes-table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  .notes-table th {
+    text-align: left; font-family: var(--font-mono); font-weight: 400;
+    font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-3); padding: 6px 14px 6px 0; border-bottom: 1px solid var(--rule);
+  }
+  .notes-table td { padding: 10px 14px 10px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .notes-table td.n {
+    font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-3);
+    white-space: nowrap; width: 1%;
+  }
+  .notes-table td.said { color: var(--ink); width: 32%; }
+  .notes-table td.coach { color: var(--ink-2); }
+  .notes-table .none { color: var(--ink-3); }
+  .pages { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pages a {
+    font-family: var(--font-mono); font-size: 0.78rem;
+    padding: 9px 15px; border-radius: 3px; text-decoration: none;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule-strong);
+  }
+  .pages a:hover { border-color: var(--ink-3); }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">For the grown-up</div>
+    <h1>Teaching notes</h1>
+    <p class="lede">Everything that used to clutter the build pages. Those are now one picture, one sentence and one big button — nothing on them is addressed to you, which is the point.</p>
+  </header>
+
+  <section>
+    <div class="eyebrow">The pages he uses</div>
+    <div class="pages">
+      <a href="first-circuits.html">Bodhi's first circuits →</a>
+      <a href="binoculars.html">The binoculars →</a>
+      <a href="breadboard-layouts.html">Signal Box layouts (reference)</a>
+    </div>
+    <p>Builds marked <b>your job, not his</b> never appear on those pages at all. Do them before he sits down.</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">Before anything else</div>
+    <h2>Let him find the hidden rows himself</h2>
+    <p>The hardest idea here isn't electricity — it's that a breadboard has connections you can't see. LEGO's connections are visible and tactile; these are hidden, and nothing else makes sense until it clicks.</p>
+    <p>Wire one light so it's on, then let him move one leg around the board and watch when it stays lit and when it dies. He'll find the rows on his own. Build&nbsp;0 in the first lesson only confirms what he discovered.</p>
+    <p>Two things worth knowing: a fresh breadboard is <b>stiff</b> — break it in yourself first, or he'll decide he's bad at this. And when a light doesn't work because it's in backwards, <b>let him find it</b>. That's the best teaching moment in the whole kit.</p>
+    <p>Fuller reasoning in <code>docs/teaching-plan.md</code>.</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">Uploading</div>
+    <h2>The two sketches</h2>
+    <ul class="plain">
+      <li><code>./flash.sh FirstLight</code> — build 4 of the first lesson. One LED on GPIO 13, blinking.</li>
+      <li><code>./flash.sh FirstDistance</code> — the binoculars. Blink rate follows the distance; with nothing in range it falls back to a slow blink, so build 1 of that lesson has a payoff before the sensor exists.</li>
+    </ul>
+    <p>Watch either with <code>./monitor.sh</code>. <code>FirstDistance</code> prints the distance it is reading, which is the fastest way to tell a wiring mistake from a sensor pointed at open air.</p>
+  </section>
+
+  <div id="notes"></div>
+
+  <footer>
+    Generated from the lesson files themselves — <code>docs/lessons/*.js</code> — so these notes cannot drift out of step with the builds they describe.
+  </footer>
+</div>
+
+<script src="lib/breadboard.js"></script>
+<script src="lib/notes.js"></script>
+<script src="lessons/first-circuits.js"></script>
+<script src="lessons/binoculars.js"></script>
+<script>
+  BBKit.notes.render(document.getElementById('notes'), ['first-circuits', 'binoculars']);
+</script>
