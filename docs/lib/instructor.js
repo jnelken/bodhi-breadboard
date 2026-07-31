@@ -28,25 +28,33 @@ window.BBKit.lessons = window.BBKit.lessons || {};
     return n;
   }
 
+  /* Stands in for the masthead. A chip with a lit pin, drawn from the same
+     --ink/--glow tokens as the rest of the kit so it never needs its own
+     theming. Sits to the left of the build tabs rather than above them, since
+     nothing here is meant to be read. */
+  var LOGO_SVG =
+    '<svg class="logo" viewBox="0 0 40 40" role="img" aria-label="Bodhi\'s Breadboard">' +
+    '<rect x="9" y="9" width="22" height="22" rx="4" fill="none" stroke="var(--ink)" stroke-width="2"/>' +
+    '<circle cx="20" cy="20" r="5" fill="var(--glow)"/>' +
+    '<line x1="9" y1="15" x2="3" y2="15" stroke="var(--ink)" stroke-width="2"/>' +
+    '<line x1="9" y1="20" x2="3" y2="20" stroke="var(--ink)" stroke-width="2"/>' +
+    '<line x1="9" y1="25" x2="3" y2="25" stroke="var(--ink)" stroke-width="2"/>' +
+    '<line x1="31" y1="15" x2="37" y2="15" stroke="var(--ink)" stroke-width="2"/>' +
+    '<line x1="31" y1="20" x2="37" y2="20" stroke="var(--ink)" stroke-width="2"/>' +
+    '<line x1="31" y1="25" x2="37" y2="25" stroke="var(--ink)" stroke-width="2"/>' +
+    '</svg>';
+
   /** The viewer's markup, built here so a lesson page stays a thin shell. */
   function scaffold(root, lesson) {
     var ui = {};
 
+    var topbar = el('div', 'topbar');
+    topbar.innerHTML = LOGO_SVG;
     ui.builds = el('div', 'builds');
-    root.appendChild(ui.builds);
+    topbar.appendChild(ui.builds);
+    root.appendChild(topbar);
 
     var viewer = el('div', 'viewer');
-
-    var bar = el('div', 'stepbar');
-    ui.stepnum = el('span', 'stepnum');
-    var right = el('span', 'bar-right');
-    ui.dots = el('span', 'dots');
-    ui.mute = el('button', 'mute', { type: 'button', title: 'Typing sound on or off' });
-    right.appendChild(ui.dots);
-    right.appendChild(ui.mute);
-    bar.appendChild(ui.stepnum);
-    bar.appendChild(right);
-    viewer.appendChild(bar);
 
     var stage = el('div', 'stage');
     ui.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -56,18 +64,20 @@ window.BBKit.lessons = window.BBKit.lessons || {};
     stage.appendChild(ui.svg);
     viewer.appendChild(stage);
 
+    /* Everything below the board — the line he's read to, the big buttons and
+       the quiet progress dots — stacks in one column so it can sit beside
+       Pac-Man instead of spanning under him. */
     var readout = el('div', 'readout');
     var text = el('div', 'readout-text');
+
+    var msg = el('div', 'msg');
     ui.say = el('p', 'say');
     ui.sayText = el('span');
     ui.say.appendChild(ui.sayText);
     ui.check = el('div', 'check', { hidden: 'hidden' });
-    text.appendChild(ui.say);
-    text.appendChild(ui.check);
-    ui.pac = el('div', 'pac', { 'aria-hidden': 'true' });
-    readout.appendChild(text);
-    readout.appendChild(ui.pac);
-    viewer.appendChild(readout);
+    msg.appendChild(ui.say);
+    msg.appendChild(ui.check);
+    text.appendChild(msg);
 
     var nav = el('div', 'nav');
     ui.prev = el('button', 'ghost', { type: 'button' });
@@ -76,7 +86,19 @@ window.BBKit.lessons = window.BBKit.lessons || {};
     ui.next.textContent = 'Next piece';
     nav.appendChild(ui.prev);
     nav.appendChild(ui.next);
-    viewer.appendChild(nav);
+    text.appendChild(nav);
+
+    var bar = el('div', 'stepbar');
+    ui.stepnum = el('span', 'stepnum');
+    ui.dots = el('span', 'dots');
+    bar.appendChild(ui.stepnum);
+    bar.appendChild(ui.dots);
+    text.appendChild(bar);
+
+    ui.pac = el('div', 'pac', { 'aria-hidden': 'true' });
+    readout.appendChild(text);
+    readout.appendChild(ui.pac);
+    viewer.appendChild(readout);
 
     root.appendChild(viewer);
     return ui;
@@ -99,7 +121,6 @@ window.BBKit.lessons = window.BBKit.lessons || {};
 
     var narrator = BBKit.narrator(ui.pac, lesson.narrator);
     var typer = BBKit.typewriter(Object.assign({ el: ui.sayText, narrator: narrator }, lesson.typing));
-    narrator.bindMuteButton(ui.mute);
 
     /* Only what the child is meant to see. Builds marked for the grown-up (board
        prep, anything that is really an adult's job) stay in the lesson file but
