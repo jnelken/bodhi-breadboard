@@ -169,7 +169,10 @@ ul.plain li { margin-bottom: 7px; }
    "Bodhi's first circuits", with the build tabs running alongside it rather
    than under a heading nobody here can read. */
 .topbar { display: flex; align-items: center; gap: 16px; flex: 0 0 auto; }
-.logo { width: 40px; height: 40px; flex: 0 0 auto; }
+.logo-link { display: block; flex: 0 0 auto; border-radius: 6px; }
+.logo-link:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.logo-link:hover .logo circle { fill: var(--brass); }
+.logo { width: 40px; height: 40px; flex: 0 0 auto; display: block; }
 
 .builds { display: flex; flex-wrap: wrap; gap: 8px; }
 .builds button {

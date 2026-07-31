@@ -50,6 +50,9 @@
     <div class="pages">
       <a href="first-circuits.html">Bodhi's first circuits →</a>
       <a href="binoculars.html">The binoculars →</a>
+      <a href="joystick.html">The joystick →</a>
+      <a href="nightlight.html">The night light →</a>
+      <a href="shadowlight.html">The shadow light →</a>
       <a href="breadboard-layouts.html">Signal Box layouts (reference)</a>
     </div>
     <p>Builds marked <b>your job, not his</b> never appear on those pages at all. Do them before he sits down.</p>
@@ -66,12 +69,15 @@
 
   <section>
     <div class="eyebrow">Uploading</div>
-    <h2>The two sketches</h2>
+    <h2>The sketches</h2>
     <ul class="plain">
       <li><code>./flash.sh FirstLight</code> — build 4 of the first lesson. One LED on GPIO 13, blinking.</li>
       <li><code>./flash.sh FirstDistance</code> — the binoculars. Blink rate follows the distance; with nothing in range it falls back to a slow blink, so build 1 of that lesson has a payoff before the sensor exists.</li>
+      <li><code>./flash.sh FirstJoystick</code> — the joystick. Blink rate follows the stick; holding the click turns the light solid.</li>
+      <li><code>./flash.sh FirstMotion</code> — the night light. The light goes solid on motion and fades back to a slow blink once the sensor settles.</li>
+      <li><code>./flash.sh FirstBrightness</code> — the shadow light. Blink rate follows the room's brightness, self-calibrating to whatever range it actually sees.</li>
     </ul>
-    <p>Watch either with <code>./monitor.sh</code>. <code>FirstDistance</code> prints the distance it is reading, which is the fastest way to tell a wiring mistake from a sensor pointed at open air.</p>
+    <p>Watch any of them with <code>./monitor.sh</code>. <code>FirstDistance</code> prints the distance it is reading, which is the fastest way to tell a wiring mistake from a sensor pointed at open air.</p>
   </section>
 
   <div id="notes"></div>
@@ -85,6 +91,10 @@
 <script src="lib/notes.js"></script>
 <script src="lessons/first-circuits.js"></script>
 <script src="lessons/binoculars.js"></script>
+<script src="lessons/joystick.js"></script>
+<script src="lessons/nightlight.js"></script>
+<script src="lessons/shadowlight.js"></script>
 <script>
-  BBKit.notes.render(document.getElementById('notes'), ['first-circuits', 'binoculars']);
+  BBKit.notes.render(document.getElementById('notes'),
+    ['first-circuits', 'binoculars', 'joystick', 'nightlight', 'shadowlight']);
 </script>

@@ -31,8 +31,10 @@ window.BBKit.lessons = window.BBKit.lessons || {};
   /* Stands in for the masthead. A chip with a lit pin, drawn from the same
      --ink/--glow tokens as the rest of the kit so it never needs its own
      theming. Sits to the left of the build tabs rather than above them, since
-     nothing here is meant to be read. */
+     nothing here is meant to be read. Wrapped in a link back to the lesson
+     picker — the one "go home" affordance a page with no words can offer. */
   var LOGO_SVG =
+    '<a class="logo-link" href="index.html" aria-label="Back to lesson picker">' +
     '<svg class="logo" viewBox="0 0 40 40" role="img" aria-label="Bodhi\'s Breadboard">' +
     '<rect x="9" y="9" width="22" height="22" rx="4" fill="none" stroke="var(--ink)" stroke-width="2"/>' +
     '<circle cx="20" cy="20" r="5" fill="var(--glow)"/>' +
@@ -42,7 +44,8 @@ window.BBKit.lessons = window.BBKit.lessons || {};
     '<line x1="31" y1="15" x2="37" y2="15" stroke="var(--ink)" stroke-width="2"/>' +
     '<line x1="31" y1="20" x2="37" y2="20" stroke="var(--ink)" stroke-width="2"/>' +
     '<line x1="31" y1="25" x2="37" y2="25" stroke="var(--ink)" stroke-width="2"/>' +
-    '</svg>';
+    '</svg>' +
+    '</a>';
 
   /** The viewer's markup, built here so a lesson page stays a thin shell. */
   function scaffold(root, lesson) {

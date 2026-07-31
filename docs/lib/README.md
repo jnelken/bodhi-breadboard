@@ -13,6 +13,9 @@ Consumers so far:
 |---|---|---|
 | `docs/first-circuits.html` | the child | the whole kit — board, narrator, typed instructions |
 | `docs/binoculars.html` | the child | same, plus the HC-SR04 sensor module |
+| `docs/joystick.html` | the child | same, plus the dual-axis joystick module |
+| `docs/nightlight.html` | the child | same, plus the HC-SR501 PIR motion sensor |
+| `docs/shadowlight.html` | the child | same, plus the photoresistor / light-sensor module |
 | `docs/teaching-notes.html` | the grown-up | `notes.js` over the same lesson files |
 | `docs/breadboard-layouts.html` | the grown-up | board, parts and overlay only, no narrator |
 

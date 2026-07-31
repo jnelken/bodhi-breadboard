@@ -1,0 +1,24 @@
+<meta charset="utf-8">
+<title>The Night Light</title>
+
+<link rel="stylesheet" href="lib/kit.css">
+
+<!-- Kid-facing. One picture, one sentence, one big button. Everything for the
+     grown-up is in teaching-notes.html. -->
+<div class="page kid">
+  <div id="kit"></div>
+</div>
+
+<script src="lib/breadboard.js"></script>
+<script src="lib/parts.js"></script>
+<script src="lib/narrator.js"></script>
+<script src="lib/typewriter.js"></script>
+<script src="lib/overlays/freenove-ext.js"></script>
+<script src="lib/instructor.js"></script>
+<script src="lessons/nightlight.js"></script>
+<script>
+  BBKit.instructor.mount(
+    document.getElementById('kit'),
+    BBKit.lessons['nightlight']
+  );
+</script>
