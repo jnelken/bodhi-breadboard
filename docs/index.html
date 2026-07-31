@@ -1,0 +1,68 @@
+<meta charset="utf-8">
+<title>Bodhi's Signal Box</title>
+
+<link rel="stylesheet" href="lib/kit.css">
+<style>
+  :root { --page-max: 980px; }
+
+  .lessons { display: flex; flex-wrap: wrap; gap: 18px; }
+  .lesson-card {
+    flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px;
+    padding: 22px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--rule-strong);
+    text-decoration: none; color: inherit;
+  }
+  .lesson-card:hover { border-color: var(--ink-3); }
+  .lesson-card h2 { font-size: 1.5rem; }
+  .lesson-card p { color: var(--ink-2); max-width: none; }
+  .lesson-card .go {
+    margin-top: auto; font-family: var(--font-mono); font-size: 0.78rem;
+    color: var(--brass);
+  }
+
+  .pages { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pages a {
+    font-family: var(--font-mono); font-size: 0.78rem;
+    padding: 9px 15px; border-radius: 3px; text-decoration: none;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--rule-strong);
+  }
+  .pages a:hover { border-color: var(--ink-3); }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">Bodhi's Signal Box</div>
+    <h1>Pick a lesson</h1>
+    <p class="lede">A plug-and-play sensor box and the breadboard lessons that go with it. Handing him the iPad? Open one of these two.</p>
+  </header>
+
+  <section>
+    <div class="lessons">
+      <a class="lesson-card" href="first-circuits.html">
+        <h2>Bodhi's first circuits</h2>
+        <p>The starting lessons — lights, a breadboard, and how the hidden rows connect.</p>
+        <span class="go">Start →</span>
+      </a>
+      <a class="lesson-card" href="binoculars.html">
+        <h2>The binoculars</h2>
+        <p>Building on the first circuits, with the HC-SR04 distance sensor added in.</p>
+        <span class="go">Start →</span>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">For the grown-up</div>
+    <div class="pages">
+      <a href="teaching-notes.html">Teaching notes →</a>
+      <a href="breadboard-layouts.html">Breadboard layouts (reference)</a>
+      <a href="build-guide.html">Full build guide</a>
+    </div>
+  </section>
+
+  <footer>
+    Bodhi's Signal Box — the plug-and-play ESP32 sensor box, and the breadboard lessons that go with it.
+  </footer>
+
+</div>
