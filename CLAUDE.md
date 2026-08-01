@@ -142,8 +142,14 @@ standing authorization for this repo specifically — it overrides the default
 "only commit when explicitly asked" behavior. Applies once a change is
 actually complete (compiles/builds, matches what was asked); don't commit
 half-finished work just to check a box. Still pause and confirm before
-anything destructive (force-push, reset --hard, rewriting history) — this
-authorization covers plain commit + push only.
+anything destructive (`reset --hard`, rewriting history) — this authorization
+covers plain commit + push only.
+
+If a push to `main` is rejected as non-fast-forward (local diverged from
+origin, e.g. after a rebase), use `git push --force-with-lease` without
+asking — the lease refuses to overwrite if origin moved since the last fetch,
+so it can't clobber work it hasn't seen. A raw `--force` (no lease) still
+requires confirmation.
 
 ## Conventions
 
