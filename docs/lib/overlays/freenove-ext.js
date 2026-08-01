@@ -129,20 +129,24 @@ window.BBKit.overlays = window.BBKit.overlays || {};
     }
 
     // The pin rows: this is where it actually plugs in — columns d and g.
+    // The "now" badge for whichever port is queued rather than drawn inline,
+    // so it can be appended after this whole loop — SVG has no z-index, so
+    // painting it last is what keeps the next column's ordinary label from
+    // landing on top of it.
     var gLabelY = b.chanTop + 20 * k;
     var dLabelY = Y('D') - 4 * k;
+    var magQueue = [];
     for (var p = FROM; p <= TO; p++) {
       if (o.pads) {
         s += '<circle class="extpad" cx="' + X(p) + '" cy="' + Y('G') + '" r="' + (3.2 * k) + '"/>';
         s += '<circle class="extpad" cx="' + X(p) + '" cy="' + Y('D') + '" r="' + (3.2 * k) + '"/>';
       }
-      var gNow = nowG.has(p), dNow = nowD.has(p);
-      if (gNow) s += ring(X(p) + 4 * k, gLabelY);
-      s += '<text class="extlbl' + (hotG.has(p) ? ' on' : '') + (gNow ? ' mag' : '') + '" transform="translate(' +
+      s += '<text class="extlbl' + (hotG.has(p) ? ' on' : '') + '" transform="translate(' +
         (X(p) + 4 * k) + ' ' + gLabelY + ') rotate(-90)">' + esc(G_LAB[p]) + '</text>';
-      if (dNow) s += ring(X(p) + 4 * k, dLabelY);
-      s += '<text class="extlbl' + (hotD.has(p) ? ' on' : '') + (dNow ? ' mag' : '') + '" transform="translate(' +
+      s += '<text class="extlbl' + (hotD.has(p) ? ' on' : '') + '" transform="translate(' +
         (X(p) + 4 * k) + ' ' + dLabelY + ') rotate(-90)">' + esc(D_LAB[p]) + '</text>';
+      if (nowG.has(p)) magQueue.push({ cx: X(p) + 4 * k, cy: gLabelY, label: G_LAB[p] });
+      if (nowD.has(p)) magQueue.push({ cx: X(p) + 4 * k, cy: dLabelY, label: D_LAB[p] });
     }
 
     if (o.caption) {
@@ -165,6 +169,10 @@ window.BBKit.overlays = window.BBKit.overlays || {};
         s += '<circle class="exttight" cx="' + X(17) + '" cy="' + Y(r) + '" r="' + (6.5 * k) + '"/>';
       });
     }
+
+    // Drawn last, on top of everything above — see the note by magQueue.
+    magQueue.forEach(function (m) { s += magBadge(m.cx, m.cy, m.label); });
+
     return s;
   }
 
