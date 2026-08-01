@@ -15,6 +15,12 @@ the hole it lands in. `docs/extension-board.md` has the full pin map — use it
 rather than reasoning about the WROVER module's own header order. The build
 occupies positions 33–63.
 
+**Breakout modules (joystick, etc.) don't standardize pin order** — the same
+part from different sellers can print its legs in a different sequence.
+`docs/module-pinouts.md` records the order confirmed against each physical
+module actually in use, so wiring diagrams don't have to guess. Check it (and
+add to it) before wiring a new module in from a diagram.
+
 **The camera module must stay unplugged.** The OV2640 claims 14 GPIOs
 (4, 5, 18, 19, 21, 22, 23, 25, 26, 27, 34, 35, 36, 39). With those gone, plus
 PSRAM (16/17), flash (6–11), the microSD slot (2/14/15) and the programming UART
