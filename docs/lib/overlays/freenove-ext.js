@@ -39,20 +39,6 @@ window.BBKit.overlays = window.BBKit.overlays || {};
     28: 'GND', 29: 'GND', 30: 'GND', 31: 'GND', 32: 'GND'
   };
 
-  /** An opaque badge behind an enlarged label — solid, not a tint, so it
-      fully occludes whatever else is drawn underneath (neighboring column
-      labels, pads) rather than letting it show through. The label text runs
-      upward-and-slightly-left from its anchor (rotate(-90) on all-ascender
-      digits with default text-anchor: start), so the badge is centered
-      offset from that anchor rather than on top of it. */
-  function magBadge(cx, cy, label) {
-    var bx = cx - 12, by = cy - 26;
-    return '<ellipse class="extlens-ring" cx="' + bx.toFixed(1) + '" cy="' + by.toFixed(1) +
-      '" rx="22" ry="34"/>' +
-      '<text class="extlbl mag" transform="translate(' + cx.toFixed(1) + ' ' + cy.toFixed(1) +
-      ') rotate(-90)">' + esc(label) + '</text>';
-  }
-
   /**
    * @param {object} b board from BBKit.board()
    * @param {Set<number>|Array<number>|{d: Array<number>, g: Array<number>}} [hot]
@@ -61,12 +47,7 @@ window.BBKit.overlays = window.BBKit.overlays || {};
    *   diagram wants when only one side of a position is actually in use.
    * @param {{pads?: boolean, shadow?: boolean, caption?: string,
    *          terminals?: boolean, tightMarks?: boolean,
-   *          redrawPositions?: Array<number>,
-   *          now?: {d: Array<number>, g: Array<number>}}} [opts]
-   *   `now` singles out the one port the *current* step's wire actually lands
-   *   on, so its label can be enlarged and ringed — `hot` alone marks
-   *   everything wired so far in the build and can't say which one matters
-   *   this instant.
+   *          redrawPositions?: Array<number>}} [opts]
    */
   function freenoveExt(b, hot, opts) {
     var o = Object.assign({
@@ -89,8 +70,6 @@ window.BBKit.overlays = window.BBKit.overlays || {};
     } else {
       hotD = hotG = toSet(hot);
     }
-    var nowD = toSet(o.now && o.now.d);
-    var nowG = toSet(o.now && o.now.g);
     var k = b.scale;
     var X = b.X, Y = b.Y;
 
@@ -129,13 +108,8 @@ window.BBKit.overlays = window.BBKit.overlays || {};
     }
 
     // The pin rows: this is where it actually plugs in — columns d and g.
-    // The "now" badge for whichever port is queued rather than drawn inline,
-    // so it can be appended after this whole loop — SVG has no z-index, so
-    // painting it last is what keeps the next column's ordinary label from
-    // landing on top of it.
     var gLabelY = b.chanTop + 20 * k;
     var dLabelY = Y('D') - 4 * k;
-    var magQueue = [];
     for (var p = FROM; p <= TO; p++) {
       if (o.pads) {
         s += '<circle class="extpad" cx="' + X(p) + '" cy="' + Y('G') + '" r="' + (3.2 * k) + '"/>';
@@ -145,8 +119,6 @@ window.BBKit.overlays = window.BBKit.overlays || {};
         (X(p) + 4 * k) + ' ' + gLabelY + ') rotate(-90)">' + esc(G_LAB[p]) + '</text>';
       s += '<text class="extlbl' + (hotD.has(p) ? ' on' : '') + '" transform="translate(' +
         (X(p) + 4 * k) + ' ' + dLabelY + ') rotate(-90)">' + esc(D_LAB[p]) + '</text>';
-      if (nowG.has(p)) magQueue.push({ cx: X(p) + 4 * k, cy: gLabelY, label: G_LAB[p] });
-      if (nowD.has(p)) magQueue.push({ cx: X(p) + 4 * k, cy: dLabelY, label: D_LAB[p] });
     }
 
     if (o.caption) {
@@ -169,9 +141,6 @@ window.BBKit.overlays = window.BBKit.overlays || {};
         s += '<circle class="exttight" cx="' + X(17) + '" cy="' + Y(r) + '" r="' + (6.5 * k) + '"/>';
       });
     }
-
-    // Drawn last, on top of everything above — see the note by magQueue.
-    magQueue.forEach(function (m) { s += magBadge(m.cx, m.cy, m.label); });
 
     return s;
   }
