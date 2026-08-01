@@ -5,11 +5,14 @@
 // blink speeds up or slows down; hold the click and the light goes solid.
 //
 // Wiring (docs/joystick.html draws it hole by hole):
-//   Joystick in row e, positions 44-48:  +5V  GND  SW  VRx  VRy
-//   (b,44) -> bottom + rail   5 V, which the extension board already supplies
-//   (b,45) -> bottom - rail   ground
-//   (a,27) -> (a,46)          SW, GPIO 13, read with the internal pull-up
-//   10k from (c,48) to (c,52) VRy into the divider
+//   Joystick in row e, positions 44-48:  SW  VRy  VRx  +5V  GND
+//   (Pin order varies by module — read the labels printed on the back of
+//   yours before trusting this. This is the order for the one this build
+//   was wired against, not a universal default.)
+//   (b,47) -> bottom + rail   5 V, which the extension board already supplies
+//   (b,48) -> bottom - rail   ground
+//   (a,27) -> (a,44)          SW, GPIO 13, read with the internal pull-up
+//   10k from (c,45) to (c,52) VRy into the divider
 //   20k from (b,52) to bottom - rail
 //   (a,52) -> (a,20)          divided VRy, GPIO 33
 //   blue wire (a,19) -> (a,55), 220 ohm to (b,57), LED (c,57)-(c,58),

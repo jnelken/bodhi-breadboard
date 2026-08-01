@@ -94,16 +94,16 @@ window.BBKit.lessons['joystick'] = {
       id: 'thumb', tab: '2 · Give it a thumb', cum: true,
       why: 'Two ideas, not five: a switch he already knows from every wire he has closed, and a knob like build 3 of first-circuits — just riding on the same stick. Skipping the second axis keeps this to four resistors instead of six that all look alike.',
       steps: [
-        { k: 'module', row: 'E', p0: 44, n: 5, pins: ['+5V', 'GND', 'SW', 'VRx', 'VRy'],
+        { k: 'module', row: 'E', p0: 44, n: 5, pins: ['SW', 'VRy', 'VRx', '+5V', 'GND'],
           say: 'The joystick! Push all five legs in.',
-          coach: 'Pin names are printed on the back of the module — check them before trusting this order. VRx gets a leg but no wire; it is simply not used in this build.' },
-        { k: 'w', a: ['B', 44], b: ['Pb', 44], c: 'v5',
+          coach: 'Pin names are printed on the back of the module — check them before trusting this order. This is the order for the module this build was wired against; a different unit may read +5V, GND, SW, VRx, VRy instead, and every wire below would need to shift with it. VRx gets a leg but no wire; it is simply not used in this build.' },
+        { k: 'w', a: ['B', 47], b: ['Pb', 47], c: 'v5',
           say: 'Red wire. This one gives it power.' },
-        { k: 'w', a: ['B', 45], b: ['Pbn', 45], c: 'gnd',
+        { k: 'w', a: ['B', 48], b: ['Pbn', 48], c: 'gnd',
           say: 'Black wire. The way back.' },
-        { k: 'w', a: ['A', 27], b: ['A', 46], c: 's1', lane: 352,
+        { k: 'w', a: ['A', 27], b: ['A', 44], c: 's1', lane: 352,
           say: 'A yellow wire to the computer. This is the click.' },
-        { k: 'r', a: ['C', 48], b: ['C', 52], v: '10kΩ',
+        { k: 'r', a: ['C', 45], b: ['C', 52], v: '10kΩ',
           say: "A big resistor on the stick's last leg." },
         { k: 'r', a: ['B', 52], b: ['Pbn', 52], v: '20kΩ',
           say: 'And the biggest one, down to the black line.',
@@ -111,7 +111,7 @@ window.BBKit.lessons['joystick'] = {
         { k: 'w', a: ['A', 52], b: ['A', 20], c: 's3',
           say: 'A green wire. Now the computer can feel the stick.',
           check: '<b>Push the stick up and down.</b> The light blinks faster and slower. Hold the click down and it turns solid.',
-          coach: 'Upload <code>./flash.sh FirstJoystick</code> now if you have not already. If pushing the stick does nothing, check the green wire is on position 20 and the yellow one on 27 — those two are easy to swap. If up makes it slow down instead of speed up, that is just how this particular stick is wired, not a mistake.' }
+          coach: 'Upload <code>./flash.sh FirstJoystick</code> now if you have not already. If pushing the stick does nothing, check the green wire is on position 20 and the yellow one on 27 — those two are easy to swap. If the click never goes solid and the blink looks erratic even before touching the stick, recheck the module\'s pin labels against the diagram first — a mismatched pin order (this build\'s module reads SW, VRy, VRx, +5V, GND rather than the more common +5V, GND, SW, VRx, VRy) will misroute power and ground into the wrong legs entirely. If up makes it slow down instead of speed up, that is just how this particular stick is wired, not a mistake.' }
       ]
     }
   ]
