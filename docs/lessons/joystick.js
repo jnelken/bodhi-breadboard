@@ -17,6 +17,10 @@
        axis — VRy, the one the box's own driver uses to drive a meter — to keep
        a single sitting to four resistors instead of six identical-looking
        ones. VRx still gets a leg in the board; it just never gets a wire.
+     - the module's own leg order is recorded in docs/module-pinouts.md — it
+       does not match the more commonly documented +5V/GND/SW/VRx/VRy layout,
+       which is why the module step below spells the pins out explicitly
+       rather than assuming the diagram's left-to-right order is universal.
 
    VRy is a 5V-ish output like the ultrasonic's Echo, so it goes through the
    same 10k/20k divider before it can touch a 3.3V pin. The click is a switch
@@ -96,7 +100,7 @@ window.BBKit.lessons['joystick'] = {
       steps: [
         { k: 'module', row: 'E', p0: 44, n: 5, pins: ['SW', 'VRy', 'VRx', '+5V', 'GND'],
           say: 'The joystick! Push all five legs in.',
-          coach: 'Pin names are printed on the back of the module — check them before trusting this order. This is the order for the module this build was wired against; a different unit may read +5V, GND, SW, VRx, VRy instead, and every wire below would need to shift with it. VRx gets a leg but no wire; it is simply not used in this build.' },
+          coach: 'Pin names are printed on the back of the module — check them before trusting this order. This is the order for the module this build was wired against (recorded in docs/module-pinouts.md); a different unit may read +5V, GND, SW, VRx, VRy instead, and every wire below would need to shift with it. VRx gets a leg but no wire; it is simply not used in this build.' },
         { k: 'w', a: ['B', 47], b: ['Pb', 47], c: 'v5',
           say: 'Red wire. This one gives it power.' },
         { k: 'w', a: ['B', 48], b: ['Pbn', 48], c: 'gnd',
