@@ -135,6 +135,16 @@ S2/S3 under pull-down and pull-up, the ultrasonic ping result, the S1 button
 state, and its own guess at what's attached. **Calibrate detection thresholds
 against its output rather than against theory.**
 
+## Git workflow
+
+**Commit and push every completed change without asking first.** This is a
+standing authorization for this repo specifically — it overrides the default
+"only commit when explicitly asked" behavior. Applies once a change is
+actually complete (compiles/builds, matches what was asked); don't commit
+half-finished work just to check a box. Still pause and confirm before
+anything destructive (force-push, reset --hard, rewriting history) — this
+authorization covers plain commit + push only.
+
 ## Conventions
 
 - Sketch per folder, matching the sibling project `../ButtonLogger`.
