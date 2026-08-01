@@ -27,13 +27,14 @@ const int PIN_TRIG = 13;
 const int PIN_ECHO = 32;
 const int PIN_LIGHT = 33;
 
-// The band that maps to a blink rate. Closer than NEAR_CM is simply "fastest" —
-// no dead zone, because a hand pressed right against the sensor should still do
-// something rather than look broken.
-const int NEAR_CM = 10;
+// The blink interval scales directly with distance — twice as far blinks
+// roughly twice as slow. FAR_CM is the reference distance where that scaling
+// reaches SLOW_MS; FAST_MS/SLOW_MS still clamp the extremes so a hand pressed
+// right against the sensor, or nothing nearby at all, still looks intentional
+// rather than broken.
 const int FAR_CM = 60;
 
-const int FAST_MS = 70;
+const int FAST_MS = 35;
 const int SLOW_MS = 700;
 
 // With nothing in range the sensor returns no echo at all. That is not an error
@@ -67,11 +68,8 @@ long readCm() {
 
 int blinkInterval(long cm) {
   if (cm < 0) return IDLE_MS;
-  if (cm <= NEAR_CM) return FAST_MS;
-  if (cm >= FAR_CM) return SLOW_MS;
-  // Linear across the band, which is close enough and easy to reason about.
-  long span = FAR_CM - NEAR_CM;
-  return FAST_MS + (int)((cm - NEAR_CM) * (SLOW_MS - FAST_MS) / span);
+  long ms = cm * SLOW_MS / FAR_CM;   // interval scales directly with distance
+  return constrain((int)ms, FAST_MS, SLOW_MS);
 }
 
 void loop() {

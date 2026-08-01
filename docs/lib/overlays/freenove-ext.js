@@ -39,6 +39,17 @@ window.BBKit.overlays = window.BBKit.overlays || {};
     28: 'GND', 29: 'GND', 30: 'GND', 31: 'GND', 32: 'GND'
   };
 
+  /** A magnifying-glass glyph behind a label — ring plus a short handle,
+      drawn before the (enlarged) text so it sits behind it. */
+  function lens(cx, cy, k) {
+    var r = 12 * k;
+    var hx = cx + r * 0.72, hy = cy + r * 0.72;
+    return '<circle class="extlens-ring" cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) +
+      '" r="' + r.toFixed(1) + '"/>' +
+      '<line class="extlens-handle" x1="' + hx.toFixed(1) + '" y1="' + hy.toFixed(1) +
+      '" x2="' + (hx + r * 0.5).toFixed(1) + '" y2="' + (hy + r * 0.5).toFixed(1) + '"/>';
+  }
+
   /**
    * @param {object} b board from BBKit.board()
    * @param {Set<number>|Array<number>|{d: Array<number>, g: Array<number>}} [hot]
@@ -47,7 +58,12 @@ window.BBKit.overlays = window.BBKit.overlays || {};
    *   diagram wants when only one side of a position is actually in use.
    * @param {{pads?: boolean, shadow?: boolean, caption?: string,
    *          terminals?: boolean, tightMarks?: boolean,
-   *          redrawPositions?: Array<number>}} [opts]
+   *          redrawPositions?: Array<number>,
+   *          now?: {d: Array<number>, g: Array<number>}}} [opts]
+   *   `now` singles out the one port the *current* step's wire actually lands
+   *   on, so its label can be enlarged under a magnifier glyph — `hot` alone
+   *   marks everything wired so far in the build and can't say which one
+   *   matters this instant.
    */
   function freenoveExt(b, hot, opts) {
     var o = Object.assign({
@@ -70,6 +86,8 @@ window.BBKit.overlays = window.BBKit.overlays || {};
     } else {
       hotD = hotG = toSet(hot);
     }
+    var nowD = toSet(o.now && o.now.d);
+    var nowG = toSet(o.now && o.now.g);
     var k = b.scale;
     var X = b.X, Y = b.Y;
 
@@ -115,9 +133,12 @@ window.BBKit.overlays = window.BBKit.overlays || {};
         s += '<circle class="extpad" cx="' + X(p) + '" cy="' + Y('G') + '" r="' + (3.2 * k) + '"/>';
         s += '<circle class="extpad" cx="' + X(p) + '" cy="' + Y('D') + '" r="' + (3.2 * k) + '"/>';
       }
-      s += '<text class="extlbl' + (hotG.has(p) ? ' on' : '') + '" transform="translate(' +
+      var gNow = nowG.has(p), dNow = nowD.has(p);
+      if (gNow) s += lens(X(p) + 4 * k, gLabelY, k);
+      s += '<text class="extlbl' + (hotG.has(p) ? ' on' : '') + (gNow ? ' mag' : '') + '" transform="translate(' +
         (X(p) + 4 * k) + ' ' + gLabelY + ') rotate(-90)">' + esc(G_LAB[p]) + '</text>';
-      s += '<text class="extlbl' + (hotD.has(p) ? ' on' : '') + '" transform="translate(' +
+      if (dNow) s += lens(X(p) + 4 * k, dLabelY, k);
+      s += '<text class="extlbl' + (hotD.has(p) ? ' on' : '') + (dNow ? ' mag' : '') + '" transform="translate(' +
         (X(p) + 4 * k) + ' ' + dLabelY + ') rotate(-90)">' + esc(D_LAB[p]) + '</text>';
     }
 

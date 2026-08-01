@@ -142,12 +142,33 @@ window.BBKit.lessons = window.BBKit.lessons || {};
         .reduce(function (all, b) { return all.concat(b.steps); }, []);
     }
 
+    /* Which overlay port, if any, this step's wire actually lands on — a wire
+       to hole ['A', 19] shares column 19 with the extension board's pin
+       spine, so it is electrically the same node as whatever GPIO the
+       overlay prints there. Used to magnify just that one label, distinct
+       from `lesson.hot`, which marks every port wired so far in the build. */
+    function stepOverlayPort(st) {
+      if (!overlay || !st || st.k !== 'w' || typeof overlay.from !== 'number') return null;
+      var hitD = [], hitG = [];
+      [st.a, st.b].forEach(function (ref) {
+        if (!ref) return;
+        var row = ref[0], p = ref[1];
+        if (p < overlay.from || p > overlay.to) return;
+        if (BBKit.rowNames.BOT.indexOf(row) !== -1) hitD.push(p);
+        else if (BBKit.rowNames.TOP.indexOf(row) !== -1) hitG.push(p);
+      });
+      return (hitD.length || hitG.length) ? { d: hitD, g: hitG } : null;
+    }
+
     function render() {
       var b = builds[bi];
       var hot = (lesson.hot && lesson.hot[b.id]) || [];
+      var now = stepOverlayPort(b.steps[si]);
 
       var svg = board.svg();
-      if (overlay) svg += overlay(board, hot, lesson.overlayOpts);
+      if (overlay) {
+        svg += overlay(board, hot, Object.assign({}, lesson.overlayOpts, now ? { now: now } : null));
+      }
 
       var doneSvg = '', nowSvg = '', halo = '';
       priorSteps(bi).forEach(function (st) { doneSvg += BBKit.draw(board, st, lesson).svg; });
