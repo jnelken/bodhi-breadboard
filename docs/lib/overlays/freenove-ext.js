@@ -39,15 +39,18 @@ window.BBKit.overlays = window.BBKit.overlays || {};
     28: 'GND', 29: 'GND', 30: 'GND', 31: 'GND', 32: 'GND'
   };
 
-  /** A magnifying-glass glyph behind a label — ring plus a short handle,
-      drawn before the (enlarged) text so it sits behind it. */
-  function lens(cx, cy, k) {
-    var r = 12 * k;
-    var hx = cx + r * 0.72, hy = cy + r * 0.72;
-    return '<circle class="extlens-ring" cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) +
-      '" r="' + r.toFixed(1) + '"/>' +
-      '<line class="extlens-handle" x1="' + hx.toFixed(1) + '" y1="' + hy.toFixed(1) +
-      '" x2="' + (hx + r * 0.5).toFixed(1) + '" y2="' + (hy + r * 0.5).toFixed(1) + '"/>';
+  /** An opaque badge behind an enlarged label — solid, not a tint, so it
+      fully occludes whatever else is drawn underneath (neighboring column
+      labels, pads) rather than letting it show through. The label text runs
+      upward-and-slightly-left from its anchor (rotate(-90) on all-ascender
+      digits with default text-anchor: start), so the badge is centered
+      offset from that anchor rather than on top of it. */
+  function magBadge(cx, cy, label) {
+    var bx = cx - 12, by = cy - 26;
+    return '<ellipse class="extlens-ring" cx="' + bx.toFixed(1) + '" cy="' + by.toFixed(1) +
+      '" rx="22" ry="34"/>' +
+      '<text class="extlbl mag" transform="translate(' + cx.toFixed(1) + ' ' + cy.toFixed(1) +
+      ') rotate(-90)">' + esc(label) + '</text>';
   }
 
   /**
@@ -61,9 +64,9 @@ window.BBKit.overlays = window.BBKit.overlays || {};
    *          redrawPositions?: Array<number>,
    *          now?: {d: Array<number>, g: Array<number>}}} [opts]
    *   `now` singles out the one port the *current* step's wire actually lands
-   *   on, so its label can be enlarged under a magnifier glyph — `hot` alone
-   *   marks everything wired so far in the build and can't say which one
-   *   matters this instant.
+   *   on, so its label can be enlarged and ringed — `hot` alone marks
+   *   everything wired so far in the build and can't say which one matters
+   *   this instant.
    */
   function freenoveExt(b, hot, opts) {
     var o = Object.assign({
@@ -134,10 +137,10 @@ window.BBKit.overlays = window.BBKit.overlays || {};
         s += '<circle class="extpad" cx="' + X(p) + '" cy="' + Y('D') + '" r="' + (3.2 * k) + '"/>';
       }
       var gNow = nowG.has(p), dNow = nowD.has(p);
-      if (gNow) s += lens(X(p) + 4 * k, gLabelY, k);
+      if (gNow) s += ring(X(p) + 4 * k, gLabelY);
       s += '<text class="extlbl' + (hotG.has(p) ? ' on' : '') + (gNow ? ' mag' : '') + '" transform="translate(' +
         (X(p) + 4 * k) + ' ' + gLabelY + ') rotate(-90)">' + esc(G_LAB[p]) + '</text>';
-      if (dNow) s += lens(X(p) + 4 * k, dLabelY, k);
+      if (dNow) s += ring(X(p) + 4 * k, dLabelY);
       s += '<text class="extlbl' + (hotD.has(p) ? ' on' : '') + (dNow ? ' mag' : '') + '" transform="translate(' +
         (X(p) + 4 * k) + ' ' + dLabelY + ') rotate(-90)">' + esc(D_LAB[p]) + '</text>';
     }

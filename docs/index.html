@@ -13,6 +13,8 @@
     text-decoration: none; color: inherit;
   }
   .lesson-card:hover { border-color: var(--ink-3); }
+  .card-head { display: flex; align-items: center; gap: 14px; }
+  .card-ico { width: 50px; height: 50px; flex: 0 0 auto; }
   .lesson-card h2 { font-size: 1.5rem; }
   .lesson-card p { color: var(--ink-2); max-width: none; }
   .lesson-card .go {
@@ -40,27 +42,72 @@
   <section>
     <div class="lessons">
       <a class="lesson-card" href="first-circuits.html">
-        <h2>Bodhi's first circuits</h2>
+        <div class="card-head">
+          <svg class="card-ico" viewBox="0 0 64 64" role="img" aria-hidden="true">
+            <line class="lead" x1="20" y1="54" x2="20" y2="36"/>
+            <line class="lead" x1="44" y1="54" x2="44" y2="36"/>
+            <circle cx="32" cy="30" r="15" fill="#D94F3D" stroke="var(--ink)" stroke-width="1.8"/>
+          </svg>
+          <h2>Bodhi's first circuits</h2>
+        </div>
         <p>The starting lessons — lights, a breadboard, and how the hidden rows connect.</p>
         <span class="go">Start →</span>
       </a>
       <a class="lesson-card" href="binoculars.html">
-        <h2>The binoculars</h2>
+        <div class="card-head">
+          <svg class="card-ico" viewBox="0 0 64 64" role="img" aria-hidden="true">
+            <rect class="part" x="8" y="24" width="48" height="18" rx="6"/>
+            <circle cx="20" cy="33" r="13" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.8"/>
+            <circle cx="44" cy="33" r="13" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.8"/>
+            <circle cx="20" cy="33" r="5.5" fill="var(--ink-3)" opacity="0.55"/>
+            <circle cx="44" cy="33" r="5.5" fill="var(--ink-3)" opacity="0.55"/>
+          </svg>
+          <h2>The binoculars</h2>
+        </div>
         <p>Building on the first circuits, with the HC-SR04 distance sensor added in.</p>
         <span class="go">Start →</span>
       </a>
       <a class="lesson-card" href="joystick.html">
-        <h2>The joystick</h2>
+        <div class="card-head">
+          <svg class="card-ico" viewBox="0 0 64 64" role="img" aria-hidden="true">
+            <rect class="part" x="12" y="44" width="40" height="14" rx="5"/>
+            <line class="lead" x1="32" y1="44" x2="40" y2="16" stroke-width="4"/>
+            <circle cx="40" cy="14" r="9" fill="var(--w-s3)" stroke="var(--ink)" stroke-width="1.8"/>
+          </svg>
+          <h2>The joystick</h2>
+        </div>
         <p>A knob and a click on one stick — push it to change the blink, click it for a solid light.</p>
         <span class="go">Start →</span>
       </a>
       <a class="lesson-card" href="nightlight.html">
-        <h2>The night light</h2>
+        <div class="card-head">
+          <svg class="card-ico" viewBox="0 0 64 64" role="img" aria-hidden="true">
+            <path d="M12 46 a20 20 0 0 1 40 0 z" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.8"/>
+            <line class="lead" x1="32" y1="10" x2="32" y2="4"/>
+            <line class="lead" x1="12" y1="18" x2="7" y2="13"/>
+            <line class="lead" x1="52" y1="18" x2="57" y2="13"/>
+            <circle cx="32" cy="46" r="3.5" fill="var(--glow)"/>
+          </svg>
+          <h2>The night light</h2>
+        </div>
         <p>A motion sensor that switches a light on — wave, and it notices.</p>
         <span class="go">Start →</span>
       </a>
       <a class="lesson-card" href="shadowlight.html">
-        <h2>The shadow light</h2>
+        <div class="card-head">
+          <svg class="card-ico" viewBox="0 0 64 64" role="img" aria-hidden="true">
+            <circle cx="30" cy="32" r="13" fill="var(--glow)" stroke="var(--ink)" stroke-width="1.8"/>
+            <g class="lead">
+              <line x1="30" y1="9" x2="30" y2="3"/>
+              <line x1="30" y1="55" x2="30" y2="61"/>
+              <line x1="7" y1="32" x2="1" y2="32"/>
+              <line x1="12" y1="14" x2="8" y2="10"/>
+              <line x1="12" y1="50" x2="8" y2="54"/>
+            </g>
+            <path d="M46 14 a24 24 0 0 1 0 36 a18 18 0 0 0 0 -36 z" fill="var(--ink)" opacity="0.4"/>
+          </svg>
+          <h2>The shadow light</h2>
+        </div>
         <p>A light sensor that answers the room — cover it with a hand and watch the light react.</p>
         <span class="go">Start →</span>
       </a>
