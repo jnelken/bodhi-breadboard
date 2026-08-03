@@ -86,9 +86,40 @@ void lcdLine(uint8_t row, const char* text) {
   }
 }
 
-// --- Jingles ------------------------------------------------------------
-struct Note { uint16_t hz; uint16_t ms; };
+// --- Sound --------------------------------------------------------------
+// ESP32's tone() starts a note and returns immediately, and a second call
+// replaces whatever was sounding. Playing a tune therefore means holding the
+// remaining notes somewhere and starting each one when the last is due to end,
+// which is what this queue does — off the main loop, so nothing blocks.
+//
+// Notes are started with their duration, so the hardware ends each one on time
+// even if update() is late (a detection sweep stalls the loop ~250 ms). A late
+// update() costs a gap between notes, never a note that drones on.
+using Show::Note;
 
+constexpr uint8_t kQueueMax = 12;
+constexpr uint16_t kGapMs = 12;  // rest at the end of each note, so two of the
+                                 // same pitch in a row are heard as two
+
+Note gQueue[kQueueMax];
+uint8_t gQueued = 0;      // notes still waiting behind the one sounding
+uint8_t gQueueNext = 0;
+uint32_t gNoteDueAt = 0;  // when the sounding note's slot ends
+bool gSounding = false;
+
+void startNote(const Note& n, uint32_t nowMs) {
+  if (n.hz > 0 && n.ms > kGapMs) {
+    tone(PIN_BUZZER, n.hz, n.ms - kGapMs);
+  } else if (n.hz > 0) {
+    tone(PIN_BUZZER, n.hz, n.ms);
+  } else {
+    noTone(PIN_BUZZER);
+  }
+  gNoteDueAt = nowMs + n.ms;
+  gSounding = true;
+}
+
+// --- Jingles ------------------------------------------------------------
 // One per registry slot, so each module announces itself with its own tune and
 // Bodhi learns them by ear.
 const Note kJingle0[] = {{880, 90}, {1175, 90}, {1568, 140}};              // ultrasonic: rising
@@ -159,19 +190,53 @@ void mask(uint8_t bits) {
 
 void allOff() { mask(0); }
 
-void note(uint16_t hz, uint16_t ms) { tone(PIN_BUZZER, hz, ms); }
+void update(uint32_t nowMs) {
+  if (!gSounding || (int32_t)(nowMs - gNoteDueAt) < 0) return;
+  if (gQueued > 0) {
+    startNote(gQueue[gQueueNext++], nowMs);
+    gQueued--;
+  } else {
+    gSounding = false;
+  }
+}
 
-void silence() { noTone(PIN_BUZZER); }
+void wait(uint32_t ms) {
+  uint32_t until = millis() + ms;
+  while ((int32_t)(millis() - until) < 0) {
+    update(millis());
+    delay(2);
+  }
+}
+
+void note(uint16_t hz, uint16_t ms) {
+  gQueued = gQueueNext = 0;  // an immediate note wins over anything queued
+  startNote({hz, ms}, millis());
+}
+
+void play(const Note* notes, uint8_t count) {
+  if (!notes || count == 0) return;
+  count = min(count, (uint8_t)(kQueueMax + 1));
+  gQueued = count - 1;
+  gQueueNext = 0;
+  for (uint8_t i = 0; i < gQueued; i++) gQueue[i] = notes[i + 1];
+  startNote(notes[0], millis());
+}
+
+void silence() {
+  gQueued = gQueueNext = 0;
+  gSounding = false;
+  noTone(PIN_BUZZER);
+}
 
 void jingle(int index) {
   if (index < 0 || index >= kJingleCount) index = kJingleCount - 1;
-  const JingleDef& j = kJingles[index];
-  for (uint8_t i = 0; i < j.count; i++) note(j.notes[i].hz, j.notes[i].ms);
+  play(kJingles[index].notes, kJingles[index].count);
 }
 
 void celebrate() {
-  const uint16_t up[] = {523, 659, 784, 1047, 1319};
-  for (uint16_t hz : up) note(hz, 90);
+  static const Note up[] = {
+      {523, 90}, {659, 90}, {784, 90}, {1047, 90}, {1319, 90}};
+  play(up, 5);
 }
 
 void boop() { note(330, 70); }

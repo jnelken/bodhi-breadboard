@@ -36,8 +36,8 @@ class Sleepy : public Game {
 
     if (nowMs - lastHum_ >= kHumEveryMs) {
       lastHum_ = nowMs;
-      Show::note(330, 180);
-      Show::note(262, 240);
+      static const Show::Note hum[] = {{330, 180}, {262, 240}};
+      Show::play(hum, 2);
     }
   }
 

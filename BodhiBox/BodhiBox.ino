@@ -77,7 +77,7 @@ void activate(int index) {
   Show::allOff();
   Show::jingle(index);
   Show::say(gDriver->name(), gGame->name());
-  delay(400);
+  Show::wait(400);  // not delay() — the jingle is still playing
 }
 
 void setup() {
@@ -99,6 +99,8 @@ void setup() {
 
 void loop() {
   uint32_t nowMs = millis();
+
+  Show::update(nowMs);  // keeps any queued tune moving
 
   gDriver->read(gSignal, nowMs);
 
