@@ -54,6 +54,14 @@ board in first" is a `coach` note, not a `check`.
 Plus `parts.js` (the drawable primitives), `overlays/` (carrier boards),
 `instructor.js` (the step machine) and `kit.css`.
 
+`instructor.js` also keeps the address bar pointed at wherever you are:
+`#<build id>/<step number>`, e.g. `first-circuits.html#knob/3`. That's a plain
+`history.replaceState` on every render, so it never grows the back-button
+history, and reopening or sharing that URL lands straight on that step. An
+unrecognized or out-of-range hash falls back to the lesson's first step rather
+than erroring. Nothing a lesson author needs to do — it comes free from
+`mount()` as long as builds keep their `id`.
+
 ## Writing a lesson
 
 Two files. First the lesson document, `docs/lessons/my-lesson.js`:

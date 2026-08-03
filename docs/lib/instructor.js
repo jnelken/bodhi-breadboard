@@ -133,6 +133,26 @@ window.BBKit.lessons = window.BBKit.lessons || {};
     if (!builds.length) throw new Error('BBKit.instructor.mount: lesson has no child-facing builds');
     var bi = 0, si = 0;
 
+    /* The URL hash is the address for a step: #<build id>/<step number>, e.g.
+       #knob/3. Build ids are the same slugs `lesson.hot` keys into, so they're
+       already stable and unique within a lesson. Steps are 1-based in the URL
+       to match what `ui.stepnum` shows on screen. */
+    function hashFor(buildIndex, stepIndex) {
+      return '#' + encodeURIComponent(builds[buildIndex].id) + '/' + (stepIndex + 1);
+    }
+
+    function fromHash() {
+      var m = decodeURIComponent(location.hash.slice(1)).match(/^([^/]+)\/(\d+)$/);
+      if (!m) return null;
+      var idx = -1;
+      builds.forEach(function (b, i) { if (b.id === m[1]) idx = i; });
+      if (idx < 0) return null;
+      return { bi: idx, si: Math.max(0, Math.min(builds[idx].steps.length - 1, m[2] - 1)) };
+    }
+
+    var fromLink = fromHash();
+    if (fromLink) { bi = fromLink.bi; si = fromLink.si; }
+
     /* Cumulative builds show everything from every earlier cumulative build, so
        build 3 stands on the two lights built in 1 and 2. A non-cumulative build
        (the parts inventory, the reveals) shows nothing but itself. */
@@ -195,6 +215,12 @@ window.BBKit.lessons = window.BBKit.lessons || {};
       Array.prototype.forEach.call(ui.builds.children, function (node, j) {
         node.setAttribute('aria-pressed', String(j === bi));
       });
+
+      /* replaceState, not pushState — the address bar should always describe
+         where you are, but Back should leave the lesson, not walk backwards
+         one piece at a time through browser history. */
+      var hash = hashFor(bi, si);
+      if (location.hash !== hash) history.replaceState(null, '', hash);
     }
 
     function step(d) {
@@ -227,6 +253,14 @@ window.BBKit.lessons = window.BBKit.lessons || {};
     document.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowRight') step(1);
       if (e.key === 'ArrowLeft') step(-1);
+    });
+
+    /* Only fires on a hash change that didn't come from render()'s own
+       replaceState (that call is silent), so this only reacts to someone
+       pasting in a different step link or hand-editing the hash. */
+    window.addEventListener('hashchange', function () {
+      var parsed = fromHash();
+      if (parsed) go(parsed.bi, parsed.si);
     });
 
     render();
