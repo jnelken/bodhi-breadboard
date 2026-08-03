@@ -6,7 +6,7 @@
 //
 // Wiring (docs/joystick.html draws it hole by hole):
 //   Joystick in row e, positions 44-48:  SW  VRy  VRx  +5V  GND
-//   (Pin order varies by module — see docs/module-pinouts.md, and read the
+//   (Pin order varies by module — see docs/modules/joystick.md, and read the
 //   labels printed on the back of yours before trusting this.)
 //   (b,47) -> bottom + rail   5 V, which the extension board already supplies
 //   (b,48) -> bottom - rail   ground

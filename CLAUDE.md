@@ -17,9 +17,11 @@ occupies positions 33–63.
 
 **Breakout modules (joystick, etc.) don't standardize pin order** — the same
 part from different sellers can print its legs in a different sequence.
-`docs/module-pinouts.md` records the order confirmed against each physical
-module actually in use, so wiring diagrams don't have to guess. Check it (and
-add to it) before wiring a new module in from a diagram.
+`docs/modules/` has one file per module, recording the order confirmed against
+each physical part actually in use, so wiring diagrams don't have to guess.
+Check it (and add to it) before wiring a new module in from a diagram. Entries
+marked *not yet confirmed* are what the datasheet says, not what anyone has
+checked — don't treat them as verified.
 
 **The camera module must stay unplugged.** The OV2640 claims 14 GPIOs
 (4, 5, 18, 19, 21, 22, 23, 25, 26, 27, 34, 35, 36, 39). With those gone, plus
@@ -171,7 +173,9 @@ requires confirmation.
 
 ## Conventions
 
-- Sketch per folder, matching the sibling project `../ButtonLogger`.
+- Sketch per folder, matching the sibling project `../bodhi-oled-board` (the
+  OLED console — a plain ESP32 DevKit, `esp32:esp32:esp32` on
+  `/dev/cu.usbserial-10`; do not cross its FQBN or port with this board's).
 - No-fail game design: no timers, no losing, no game-over. Mistakes get a
   cheerful noise, not a penalty.
 - Serial is 115200 and always narrates what the box is doing — it is the primary

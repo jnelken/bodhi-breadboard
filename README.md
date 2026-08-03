@@ -114,4 +114,10 @@ not a loose wire. Check the camera is unplugged.
 - `BodhiBox/` — the game
 - `BodhiBox/src/` — signal abstraction, sensor drivers, games, LED/sound output
 - `PortScanner/` — diagnostic sketch
+- `docs/modules/` — one file per module: leg order, voltages, and what's
+  actually been confirmed against the part in hand
 - `CLAUDE.md` — pin map rationale and architecture notes
+
+The sibling project `../bodhi-oled-board` is **a different board** — a plain
+ESP32 DevKit with an OLED, running a five-game console. Different FQBN
+(`esp32:esp32:esp32`) and a different serial port; don't cross them.
