@@ -253,14 +253,18 @@ details.grown p { margin-top: 10px; color: var(--ink-2); }
    screen rather than the page. He is aiming a finger, not a scrollbar — the
    whole viewer has to fit in one look, so the page claims the full viewport
    height and everything in it (the board, the buttons) sizes down to share it
-   rather than pushing the bottom off screen. */
-body:has(.page.kid) { margin: 0; height: 100dvh; overflow: hidden; }
+   rather than pushing the bottom off screen. Lifted once body gets
+   .lesson-done, so a page with a below-the-fold grown-up panel (see
+   docs/binoculars.html) can actually be scrolled to once there's something
+   worth scrolling to. */
+body:has(.page.kid):not(.lesson-done) { margin: 0; height: 100dvh; overflow: hidden; }
 .page.kid {
   height: 100%; box-sizing: border-box;
   padding: 14px 20px; margin: 0 auto;
   display: flex; flex-direction: column; gap: 14px;
   overflow: hidden;
 }
+body.lesson-done .page.kid { height: auto; overflow: visible; }
 
 /* ---- 7. Narrator -------------------------------------------------------- */
 

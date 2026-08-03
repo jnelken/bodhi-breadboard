@@ -3,3 +3,8 @@ build/
 *.elf
 *.map
 .DS_Store
+
+# Published flash images for docs/binoculars.html's Web Serial installer —
+# GitHub Pages serves docs/ as-is with no build step, so these have to be
+# checked in for the web flasher to fetch them. See ./publish-firmware.sh.
+!docs/firmware/**/*.bin

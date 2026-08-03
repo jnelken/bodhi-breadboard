@@ -127,6 +127,24 @@ arduino-cli upload -p /dev/cu.usbserial-210 \
 `arduino-cli` compiles `.cpp`/`.h` under a sketch's `src/` recursively, which is
 why the modules live in `BodhiBox/src/`.
 
+`./flash.sh FirstDistance --publish` also runs `./publish-firmware.sh`, which
+rebuilds the sketch and copies flashable binaries + a manifest into
+`docs/firmware/FirstDistance/` for the Web Serial installer embedded in
+`docs/binoculars.html` (a "for the grown-up" panel that appears once the
+lesson is complete). Those binaries are committed to git on purpose — GitHub
+Pages serves `docs/` with no build step, so re-run the publish step (and
+commit) whenever `FirstDistance.ino` changes, or the web installer silently
+serves stale firmware.
+
+That same panel live-tunes `FAST_MS`/`SLOW_MS`/`FAR_CM` over serial without a
+reflash: the sketch persists them to NVS (`Preferences`) and speaks a small
+line-based protocol alongside its usual narration —
+`GET` asks for the current values, `FAST_MS=<n>` (also `SLOW_MS=`, `FAR_CM=`)
+applies and persists one, and the board replies to either with
+`CFG FAST_MS=.. SLOW_MS=.. FAR_CM=..`. Any future sketch that wants the same
+live-tuning panel should reuse this protocol shape rather than inventing a new
+one.
+
 ## Diagnostics
 
 `PortScanner/` is the tool for any "why isn't it detecting?" question. Flash it,

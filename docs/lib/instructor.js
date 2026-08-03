@@ -185,6 +185,13 @@ window.BBKit.lessons = window.BBKit.lessons || {};
         : (b.cum ? 'Next piece' : 'Next');
       ui.next.disabled = (lastBuild && lastStep);
 
+      /* A generic hook, not a binoculars-specific one — any lesson page can
+         listen for this on its root element to reveal something once the
+         child has actually finished. Harmless for pages with no listener. */
+      if (lastBuild && lastStep) {
+        root.dispatchEvent(new CustomEvent('bbkit:complete', { bubbles: true }));
+      }
+
       Array.prototype.forEach.call(ui.builds.children, function (node, j) {
         node.setAttribute('aria-pressed', String(j === bi));
       });

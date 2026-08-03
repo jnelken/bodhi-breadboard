@@ -9,16 +9,51 @@
   <div id="kit"></div>
 </div>
 
+<!-- Grown-up bonus, revealed only once the lesson reports itself complete
+     (see the bbkit:complete listener below) — stays out of the way while
+     Bodhi is still building. Live tuning talks to the board over Web Serial;
+     flashing uses Espressif's esp-web-tools against the checked-in binary at
+     docs/firmware/FirstDistance/. -->
+<div class="page grown" id="tuner" hidden>
+  <section>
+    <div class="eyebrow">For the grown-up</div>
+    <h2>Tune it live</h2>
+    <p>Connect over USB and drag a slider — the board applies each
+      change immediately and remembers it after a reboot. No reflash needed.</p>
+    <div id="tuner-controls"></div>
+  </section>
+  <section>
+    <h3>Flash new firmware</h3>
+    <p>Uploads <code>FirstDistance</code> straight from this page
+      over USB, no terminal required.</p>
+    <esp-web-install-button manifest="firmware/FirstDistance/manifest.json"></esp-web-install-button>
+  </section>
+</div>
+
 <script src="lib/breadboard.js"></script>
 <script src="lib/parts.js"></script>
 <script src="lib/narrator.js"></script>
 <script src="lib/typewriter.js"></script>
 <script src="lib/overlays/freenove-ext.js"></script>
 <script src="lib/instructor.js"></script>
+<script src="lib/tuner.js"></script>
 <script src="lessons/binoculars.js"></script>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js"></script>
 <script>
-  BBKit.instructor.mount(
-    document.getElementById('kit'),
-    BBKit.lessons['binoculars']
-  );
+  var kit = document.getElementById('kit');
+  BBKit.instructor.mount(kit, BBKit.lessons['binoculars']);
+
+  kit.addEventListener('bbkit:complete', function () {
+    document.getElementById('tuner').hidden = false;
+    document.body.classList.add('lesson-done');
+    var tuner = BBKit.tuner.mount(document.getElementById('tuner-controls'));
+
+    /* Web Serial only lets one open connection hold a port at a time. The
+       tuner and esp-web-tools each request their own, so if the tuner still
+       has the port open when a flash starts, releasing it first (capture
+       phase, ahead of the install button's own click handler) avoids a
+       port-already-open failure. */
+    document.querySelector('esp-web-install-button')
+      .addEventListener('click', function () { tuner.disconnect(); }, true);
+  }, { once: true });
 </script>
