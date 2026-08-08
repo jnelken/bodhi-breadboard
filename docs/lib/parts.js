@@ -141,6 +141,40 @@ window.BBKit = window.BBKit || {};
   }
 
   /**
+   * A 4-leg tactile switch straddling the channel. Two legs per row, two
+   * columns apart; the pair sharing a row is permanently joined inside the
+   * part, which is the whole reason a button can look wired correctly and
+   * still do nothing (see docs/modules/push-button.md). That joined pair is
+   * drawn, not just the four legs — the drawing is where it gets taught.
+   *
+   * st: { p, rowTop, rowBot }
+   */
+  function button(b, st) {
+    var k = b.scale;
+    var t0 = b.pt([st.rowTop, st.p]), t1 = b.pt([st.rowTop, st.p + 2]);
+    var g0 = b.pt([st.rowBot, st.p]), g1 = b.pt([st.rowBot, st.p + 2]);
+    var x0 = t0.x - 10 * k, x1 = t1.x + 10 * k;
+    var y0 = Math.min(t0.y, g0.y) - 10 * k, y1 = Math.max(t0.y, g0.y) + 10 * k;
+    var cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+
+    var s = '';
+    [t0, t1, g0, g1].forEach(function (h) {
+      s += '<line class="lead" x1="' + h.x + '" y1="' + h.y + '" x2="' + h.x + '" y2="' +
+        (h.y + (h.y < cy ? 8 * k : -8 * k)) + '"/>';
+    });
+    s += '<rect class="part" x="' + x0 + '" y="' + y0 + '" width="' + (x1 - x0) +
+      '" height="' + (y1 - y0) + '" rx="' + (4 * k) + '"/>';
+    s += '<line class="btnlink" x1="' + t0.x + '" y1="' + t0.y + '" x2="' + t1.x + '" y2="' + t1.y + '"/>';
+    s += '<line class="btnlink" x1="' + g0.x + '" y1="' + g0.y + '" x2="' + g1.x + '" y2="' + g1.y + '"/>';
+    s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (7 * k) +
+      '" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.6"/>';
+    return {
+      svg: s, at: { x: cx, y: cy },
+      r: Math.max((x1 - x0) / 2, (y1 - y0) / 2) + 10 * k
+    };
+  }
+
+  /**
    * A labelled box, positioned in pixels rather than holes — for the parts that
    * genuinely are not on the board, like a sensor module on the end of a plug.
    */
@@ -287,6 +321,15 @@ window.BBKit = window.BBKit || {};
         '<line class="lead" x1="' + (cx + 7) + '" y1="' + (cy + 6) + '" x2="' + (cx + 7) + '" y2="' + (cy + 22) + '"/>' +
         '<circle cx="' + cx + '" cy="' + (cy - 2) + '" r="17" fill="' + p.tone + '" stroke="var(--ink)" stroke-width="1.8"/>';
     }
+    if (p.k === 'button') {
+      var u = '<rect class="part" x="' + (cx - 26) + '" y="' + (cy - 20) + '" width="52" height="40" rx="6"/>';
+      [[-16, -20, -32], [16, -20, -32], [-16, 20, 32], [16, 20, 32]].forEach(function (d) {
+        u += '<line class="lead" x1="' + (cx + d[0]) + '" y1="' + (cy + d[1]) +
+          '" x2="' + (cx + d[0]) + '" y2="' + (cy + d[2]) + '"/>';
+      });
+      u += '<circle cx="' + cx + '" cy="' + cy + '" r="11" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.8"/>';
+      return u;
+    }
     if (p.k === 'pot') {
       var t = '<circle cx="' + cx + '" cy="' + (cy - 4) + '" r="20" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="1.8"/>';
       t += '<line class="lead" x1="' + cx + '" y1="' + (cy - 4) + '" x2="' + (cx + 11) + '" y2="' + (cy - 15) + '"/>';
@@ -330,7 +373,7 @@ window.BBKit = window.BBKit || {};
 
   /** Step kind -> primitive. A lesson only ever names these short keys. */
   var KIND = {
-    w: wire, r: resistor, led: led, pot: pot, npn: transistor,
+    w: wire, r: resistor, led: led, pot: pot, npn: transistor, button: button,
     module: sensorModule, block: block, zone: zone, reveal: reveal, parts: partsPanel
   };
 
@@ -346,7 +389,7 @@ window.BBKit = window.BBKit || {};
   BBKit.COLOR = COLOR;
   BBKit.draw = draw;
   BBKit.parts = {
-    wire: wire, resistor: resistor, led: led, pot: pot, transistor: transistor,
+    wire: wire, resistor: resistor, led: led, pot: pot, transistor: transistor, button: button,
     sensorModule: sensorModule, block: block, zone: zone, reveal: reveal,
     partsPanel: partsPanel, rawWire: rawWire, partIcon: partIcon,
     bands: BANDS, kinds: KIND

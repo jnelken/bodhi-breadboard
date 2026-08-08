@@ -131,6 +131,7 @@ ul.plain li { margin-bottom: 7px; }
 .tval { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); font-weight: 600; text-anchor: middle; }
 .tpin { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-2); text-anchor: middle; }
 .tmod { font-family: var(--font-display); font-size: 13px; fill: var(--ink); font-weight: 600; }
+.btnlink { stroke: var(--ink-3); stroke-width: 2; stroke-dasharray: 2.5 3; }
 
 /* The parts inventory, drawn like the page a LEGO booklet opens on. */
 .panel { fill: var(--surface); stroke: var(--rule-strong); stroke-width: 1.5; }
