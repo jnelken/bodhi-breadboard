@@ -7,14 +7,19 @@
 # 0x8000, boot_app0 at 0xe000, app at 0x10000.
 #
 #   ./publish-firmware.sh FirstDistance
+#   ./publish-firmware.sh SomeDevKitSketch esp32:esp32:esp32
+#
+# FQBN defaults to this repo's board (the Freenove WROVER CAM) — pass a
+# second argument for a sketch built against different hardware, e.g. the
+# plain ESP32 DevKit in the sibling bodhi-oled-board project.
 #
 # These binaries get committed to git — GitHub Pages serves docs/ straight
 # from the repo with no build step, so re-run this (and commit) whenever the
 # sketch changes, or the web installer silently serves stale firmware.
 set -euo pipefail
 
-SKETCH="${1:?usage: ./publish-firmware.sh <Sketch>}"
-FQBN="esp32:esp32:esp32wrover"
+SKETCH="${1:?usage: ./publish-firmware.sh <Sketch> [FQBN]}"
+FQBN="${2:-esp32:esp32:esp32wrover}"
 ARDUINO15="${ARDUINO15:-$HOME/Library/Arduino15}"
 
 cd "$(dirname "$0")"
