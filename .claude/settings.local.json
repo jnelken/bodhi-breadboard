@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/jake/.claude/hooks/**)",
+      "Read(//Users/jake/.claude/**)",
+      "Bash(env)"
+    ]
+  }
+}
